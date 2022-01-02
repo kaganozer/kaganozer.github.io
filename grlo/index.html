@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GR-LO</title>
+    <link rel="icon" href="imgs/favicon.png">
+    <link rel="stylesheet" href="styles/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway&family=Open+Sans:wght@300;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav id="navbar">
+                <a href=""><img id="logo" src="imgs/logo.png"></a>
+            </nav>
+        </div>
+    </header>
+    <section>
+        <h1 id="slogan">Temiz Deniz, Temiz Ülke, Temiz Dünya</h1>
+        <div class="slideshow">
+            <div class="slide">
+                <img src="imgs/resim-1.jpeg">
+            </div>
+            <div class="slide">
+                <img src="imgs/resim-2.jpeg">
+            </div>
+            <div class="slide">
+                <img src="imgs/resim-3.jpeg">
+            </div>
+            <div class="slide">
+                <img src="imgs/resim-4.jpeg">
+            </div>
+            <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+            <a class="next" onclick="plusSlides(1)">&#10095;</a>
+        </div>
+        <br>
+        <div style="text-align:center">
+            <span class="dot" onclick="currentSlide(1)"></span>
+            <span class="dot" onclick="currentSlide(2)"></span>
+            <span class="dot" onclick="currentSlide(3)"></span>
+            <span class="dot" onclick="currentSlide(4)"></span>
+        </div>
+        <br>
+        <div class="yazılar">
+            <div id="değerlerimiz">
+                <h2>Değerlerimiz</h2>
+                <br>
+                <p>Öncelikli hedefimiz ülkemiz ve sonrasında tüm dünya denizlerinde, deniz yaşamını tehdit eden sistemleri ortadan kaldırarak daha yeşil ve yaşanabilir bir dünya hedefine katkıda bulunmaktır.</p>
+            </div>
+            <div id="destekçilerimiz">
+                <h2>Destekçilerimiz</h2>
+                <br>
+                <p>Forest Green Rovers FC, MSC, Evergreen, UNICO, Hapag-Lloyd, Maersk, Arkas Line, TURKON, Martı Shipping, OMSAN</p>
+            </div>
+            <div id="hakkımızda">
+                <h2>Hakkımızda</h2>
+                <br>
+                <p>Gemi ve deniz araçlarının deniz ve okyanuslara bıraktığı atıklar tonlarca deniz suyunu kirletmekte, üç tarafı denizlerle çevrili ülkemizin  balık ve  canlı popülasyonunu yok etmektedir. Kâr amacı gütmeyen bir kuruluş olarak bizim amacımız gemilerin bu atıklarını denizlere dökmemesini sağlamak, bu konuda denetimleri arttırmak ayrıca deniz kirliliğinin fazla olduğu limanlarımızda ve deniz trafiğinin yoğun olduğu rotalar yakınlarında tesislerimiz ve teknelerimiz aracılığıyla gemilerden atıkları tahliye etmektir. Yaptığımız tüm işlemler Türkiye Cumhuriyeti’nin belirlemiş olduğu GEMİLERDEN ATIK ALINMASI VE ATIKLARIN KONTROLÜ YÖNETMELİĞİ’ne uygundur.  Hedefimiz deniz temizliği açısından birçok sıkıntı çeken Türkiye’mizi ve denizlerimizi daha yaşanabilir hale getirmektir. Ayrıca yapılan hizmetler sonrasında destekçilerimiz birçok uluslararası örgütten de onaylı ‘Green Route Belgesi’ne sahip olacaktır.</p>
+            </div>
+        </div>
+        <br>
+        <div class="haberler">
+            <h1>Haberler</h1>
+            <div class="haber" id="haber-1">
+                <img src="imgs/haber-1.jpeg" alt="">
+                <div>
+                    <a href="https://www.aa.com.tr/tr/cevre/akdenizde-artan-mikroplastikler-hem-deniz-canlilarini-hem-insanlari-tehdit-ediyor-/2441822">
+                    Akdeniz'de artan mikroplastikler hem deniz canlılarını hem insanları tehdit ediyor</a>
+                    <p>ODTÜ Deniz Bilimleri Enstitüsü Öğretim Üyesi Prof. Dr. Ahmet Erkan Kıdeyş, deniz çöplerinin parçalanma ürünleri olan mikroplastiklerin miktarının tüm deniz canlıları için bir tehdit haline geldiğini söyledi.</p>
+                </div>
+            </div>
+            <div class="haber" id="haber-2">
+                <img src="imgs/haber-2.jpeg" alt="">
+                <div>
+                    <a href="https://www.teknotalk.com/ng-arastirma-sonuclari-marmaradaki-deniz-kirliligi-ve-musilaj-88628/">
+                    Marmara'daki deniz kirliliği ve müsilajda son durum</a>
+                    <p>Deniz kirliliğinin başlıca nedenleri... Marmara Denizi deniz kirliliğine uzun süredir kırmızı alarm niteliğinde tepki veriyor. Peki, denizlerimizi ve doğrudan tüm canlıları etkileyen bu kirliliğe en çok neler sebep olduğunu düşünüyoruz?</p>
+                </div>
+            </div>
+            <div class="haber" id="haber-3">
+                <img src="imgs/haber-3.jpeg" alt="">
+                <div>
+                    <a href="https://www.birgun.net/haber/izmir-de-deniz-kirliligi-buyuyor-korfez-cok-hasta-365553">
+                    İzmir'de deniz kirliliği büyüyor: Körfez çok hasta</a>
+                    <p>İzmir İnciraltı kıyılarındaki yüzlerce kuş türüne ev sahipliği yapan Çakalburnu Lagünü’nün 4’te 3’ü deniz maruluyla kaplandı. Dokuz Eylül Üniversite’sinden Prof. Dr. Doğan Yaşar “Körfez artık alarm veriyor” dedi.</p>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="etkinlikler">
+            <h1>Etkinliklerimiz</h1>
+            <div>
+                <img src="imgs/etkinlik-1.jpeg" alt="">
+                <img src="imgs/etkinlik-2.jpeg" alt="">
+            </div>
+        </div>
+        <h1>Destekçimiz Olun!</h3>
+        <div class="slideshow" id="ürünSlide">
+            <div class="ürün">
+                <img src="imgs/ürün-1.jpeg">
+            </div>
+            <div class="ürün">
+                <img src="imgs/ürün-2.jpeg">
+            </div>
+            <div class="ürün">
+                <img src="imgs/ürün-3.jpeg">
+            </div>
+            <div class="ürün">
+                <img src="imgs/ürün-4.jpeg">
+            </div>
+            <div class="ürün">
+                <img src="imgs/ürün-5.jpeg">
+            </div>
+            <a class="prev" onclick="plusSlides2(-1)">&#10094;</a>
+            <a class="next" onclick="plusSlides2(1)">&#10095;</a>
+        </div>
+        <div style="text-align:center;display: flex;align-items: center;">
+            <img src="imgs/ürün-1.jpeg" class="ürünR" onclick="currentSlide2(1)">
+            <img src="imgs/ürün-2.jpeg" class="ürünR" onclick="currentSlide2(2)">
+            <img src="imgs/ürün-3.jpeg" class="ürünR" onclick="currentSlide2(3)">
+            <img src="imgs/ürün-4.jpeg" class="ürünR" onclick="currentSlide2(4)">
+            <img src="imgs/ürün-5.jpeg" class="ürünR" onclick="currentSlide2(5)">
+        </div>
+    </section>
+    <footer>
+        <form>
+            <h3>Bizimle İletişime Geçin!</h3>
+            <br>
+            <label for="email">İsim Soyisim</label>
+            <input type="text" name="isim" id="isim" required>
+            <br>
+            <label for="email">Telefon Numarası</label>
+            <input type="text" name="numara" id="numara" required>
+            <br>
+            <label for="email">Email</label>
+            <input type="email" name="email" id="email" required>
+            <br>
+            <input type="submit" value="Submit">
+        </form>
+    </footer>
+    <script src="scripts/script.js"></script>
+    <script src="scripts/script2.js"></script>
+</body>
+</html>
