@@ -1,0 +1,38 @@
+.theme-dark {
+    --primary: #051c2e;
+    --secondary: #2d4253;
+}
+
+.theme-light {
+    --primary: #635367;
+    --secondary: #917c91;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    transition: 0.2s;
+    font-weight: normal;
+    color: #fff;
+    font-family: "Playfair Display", serif;
+}
+
+*:focus {
+    outline: none;
+}
+
+body {
+    background-color: var(--secondary);
+}
+
+a {
+    text-decoration: none;
+}
+
+li {
+    list-style: none;
+}
+
+h1 {
+    font-family: "Cinzel", serif;
+}

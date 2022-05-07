@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" class="theme-dark">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/mobile.css" media="screen and (max-width:768px)">
+    <link href="https://fonts.googleapis.com/css?family=Cinzel:regular,500,600,700,800,900" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css?family=Playfair+Display:regular,500,600,700,800,900,italic,500italic,600italic,700italic,800italic,900italic" rel="stylesheet" />
+    <script src="https://kit.fontawesome.com/7b173948ba.js" crossorigin="anonymous"></script>
+    <title>Pusulamız Edebiyat</title>
+</head>
+<body>
+    <header>
+        <nav id="navDesktop"></nav>
+        <nav id="navMobile">
+            <input type="checkbox" id="hamBtn">
+            <label for="hamBtn">
+                <div></div><div></div><div></div>
+            </label>
+            <h1 id="logo">P. E.</h1>
+            <div id="menuMobile">
+                <div id="menuItemsMobile">
+                    <h1>Pusulamız Edebiyat</h1>
+                    <br>
+                    <li><a href="#home">Ana Sayfa</a></li>
+                    <li><a href="https://aydoganyagcibsm.meb.k12.tr">Hakkımızda</a></li>
+                    <li><a href="#">İletişim</a></li>
+                    <br>
+                    <li>
+                        <!-- Checked: Light Theme -->
+                        Tema
+                        <input type="checkbox" id="themeMobile">
+                        <label for="themeMobile"></label>
+                    </li>
+                </div>
+                <a></a>
+            </div>
+        </nav>
+    </header>
+    <section id="home">
+        <div id="imgs">
+            <img src="imgs/attila-ilhan.png" alt="">
+            <img src="imgs/hidayet-karakus.png" alt="">
+            <img src="imgs/homeros.png" alt="">
+            <img src="imgs/ihsan-oktay.png" alt="">
+            <img src="imgs/neyzen-tevfik.png" alt="">
+        </div>
+    </section>
+    <footer>
+        <nav id="ftDesktop"></nav>
+        <nav id="ftMobile">
+            <div id="footerMenu">
+                <li id="homeBtn"><a href="#home"><i class="fa-solid fa-house"></i></a></li>
+            </div>
+        </nav>
+    </footer>
+
+    <script src="scripts/script.js"></script>
+</body>
+</html>
