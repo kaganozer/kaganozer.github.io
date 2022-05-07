@@ -1,0 +1,11 @@
+#bilgilendirme {
+    color: black;
+    font-size: larger;
+    font-weight: bolder;
+}
+
+body :not(#bilgilendirme) {
+    display: none;
+}
+
+[id*="mobile"] {display: none;}

@@ -1,22 +1,27 @@
-#navMobile {
+[id*="desktop"], #bilgilendirme {display: none;}
+
+nav {
     position: fixed;
-    top: 0;
-    left: 0;
     width: 100%;
     height: 50px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 0 20px;
     background-color: var(--primary);
 }
 
-#navMobile h1 {
+#mobileNav {
+    top: 0;
+    justify-content: space-between;
+    border-radius: 0 0 25px 0;
+    z-index: 1;
+}
+
+#mobileNav h1 {
     font-weight: bolder;
 }
 
 #logo {
-    padding-right: 40px;
+    margin-right: 20px;
 }
 
 #hamBtn {
@@ -29,6 +34,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    margin-left: 20px;
 }
 
 #hamBtn ~ label[for="hamBtn"] div {
@@ -56,7 +62,12 @@
     transform: rotate(-45deg);
 }
 
-#menuMobile {
+#hamBtn:checked ~ #logo {
+    opacity: 0;
+    transform: translate(-200%);
+}
+
+#mobileMenu {
     position: fixed;
     bottom: 0;
     left: 0;
@@ -66,45 +77,49 @@
     display: flex;
 }
 
-#menuMobile h1 {
+#mobileMenu h1 {
     margin: 5px 0;
     padding: 5px;
     padding-bottom: 15px;
     border-bottom: 1px solid white;
 }
 
-#menuItemsMobile {
+#mobileMenuItems {
     padding: 15px;
     width: 200px;
     height: 100%;
     background-color: var(--primary);
+    box-shadow: 0 0 25px var(--primary);
 }
 
-#menuItemsMobile li{
+#mobileMenuItems li{
     margin: 5px 0;
     padding: 5px;
 }
 
-#menuItemsMobile li:not(:last-child):hover{
+#mobileMenuItems li:not(#liTheme, #kagan):hover{
     background-color: var(--secondary);
     cursor: pointer;
 }
 
-#menuItemsMobile :nth-child(4){
+#mobileMenuItems :nth-child(4){
     border-top: 1px solid white;
     border-bottom: 1px solid white;
 }
 
-#menuMobile > a {
+#kagan {
+}
+
+#mobileMenu > a {
     width: calc(100% - 200px);
     height: 100%;
 }
 
-#themeMobile {
+#mobileTheme {
     display: none;
 }
 
-label[for="themeMobile"] {
+label[for="mobileTheme"] {
     margin: 5px 0;
     display: flex;
     align-items: center;
@@ -114,7 +129,7 @@ label[for="themeMobile"] {
     background-color: var(--secondary);
 }
 
-label[for="themeMobile"]::before {
+label[for="mobileTheme"]::before {
     position: relative;
     content: "";
     width: 25px;
@@ -125,11 +140,11 @@ label[for="themeMobile"]::before {
     transition: 0.2s;
 }
 
-#themeMobile:checked ~ label[for="themeMobile"]::before {
+#mobileTheme:checked ~ label[for="mobileTheme"]::before {
     transform: translate(100%) rotate(360deg) scale(0.8);
 }
 
-#hamBtn:checked ~ #menuMobile{
+#hamBtn:checked ~ #mobileMenu{
     transform: translate(0px);
 }
 
@@ -137,16 +152,10 @@ label[for="themeMobile"]::before {
     backdrop-filter: blur(10px);
 }
 
-#ftMobile {
-    position: fixed;
+#mobileFt {
     bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 50px;
-    background-color: var(--primary);
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
+    justify-content: center;
+    border-radius: 25px 25px 0 0;
 }
 
 #homeBtn {
@@ -160,14 +169,5 @@ label[for="themeMobile"]::before {
     border-radius: 50%;
     font-size: 1.2rem;
     background-color: var(--primary);
-}
-
-#imgs {
-    padding: 75px 0;
-    width: 50%;
-    margin: 0 auto;
-}
-
-img {
-    width: 100%;
+    z-index: 1;
 }

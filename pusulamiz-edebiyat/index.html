@@ -5,58 +5,60 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="styles/mobile.css" media="screen and (max-width:768px)">
+    <link rel="stylesheet" href="mobile/mobile.css" media="screen and (max-width:768px)">
+    <link rel="stylesheet" href="mobile/main.css" media="screen and (max-width:768px)">
+    <link rel="stylesheet" href="desktop/desktop.css" media="screen and (min-width:769px)">
     <link href="https://fonts.googleapis.com/css?family=Cinzel:regular,500,600,700,800,900" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css?family=Playfair+Display:regular,500,600,700,800,900,italic,500italic,600italic,700italic,800italic,900italic" rel="stylesheet" />
     <script src="https://kit.fontawesome.com/7b173948ba.js" crossorigin="anonymous"></script>
     <title>Pusulamız Edebiyat</title>
 </head>
 <body>
+    <div id="bilgilendirme">
+        BİLGİLENDİRME! Şu anda henüz hazırlık aşamasında olan Desktop modunu görüntülemeye çalışıyorsunuz. Sitenin çalışabilmesi için siteyi -ekranı maximum 768 pixel'lik olan- bir telefonda açmanız ya da telefon ekranınızı dikey konuma getirmeniz gerekmektedir.
+    </div>
     <header>
-        <nav id="navDesktop"></nav>
-        <nav id="navMobile">
+        <nav id="desktopNav"></nav>
+        <nav id="mobileNav">
             <input type="checkbox" id="hamBtn">
             <label for="hamBtn">
                 <div></div><div></div><div></div>
             </label>
             <h1 id="logo">P. E.</h1>
-            <div id="menuMobile">
-                <div id="menuItemsMobile">
+            <div id="mobileMenu">
+                <div id="mobileMenuItems">
                     <h1>Pusulamız Edebiyat</h1>
                     <br>
                     <li><a href="#home">Ana Sayfa</a></li>
-                    <li><a href="https://aydoganyagcibsm.meb.k12.tr">Hakkımızda</a></li>
+                    <li><a href="https://aydoganyagcibsm.meb.k12.tr" target="_blank">Hakkımızda</a></li>
                     <li><a href="#">İletişim</a></li>
                     <br>
-                    <li>
-                        <!-- Checked: Light Theme -->
+                    <li id="liTheme">
                         Tema
-                        <input type="checkbox" id="themeMobile">
-                        <label for="themeMobile"></label>
+                        <input type="checkbox" id="mobileTheme">
+                        <label for="mobileTheme"></label>
                     </li>
+                    <li id="kagan">Hamza Kağan Özer</li>
                 </div>
                 <a></a>
             </div>
         </nav>
     </header>
     <section id="home">
-        <div id="imgs">
-            <img src="imgs/attila-ilhan.png" alt="">
-            <img src="imgs/hidayet-karakus.png" alt="">
-            <img src="imgs/homeros.png" alt="">
-            <img src="imgs/ihsan-oktay.png" alt="">
-            <img src="imgs/neyzen-tevfik.png" alt="">
-        </div>
+        <h1>~ İZMİR ~</h1>
+        <div id="ilceler"></div>
     </section>
     <footer>
-        <nav id="ftDesktop"></nav>
-        <nav id="ftMobile">
+        <nav id="desktopFt"></nav>
+        <nav id="mobileFt">
             <div id="footerMenu">
                 <li id="homeBtn"><a href="#home"><i class="fa-solid fa-house"></i></a></li>
             </div>
         </nav>
     </footer>
 
-    <script src="scripts/script.js"></script>
+    <script src="scripts/script.js" type="module"></script>
+    <script src="scripts/mobile.js"></script>
+    <script src="scripts/desktop.js"></script>
 </body>
 </html>

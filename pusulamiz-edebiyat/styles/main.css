@@ -1,11 +1,11 @@
 .theme-dark {
-    --primary: #051c2e;
-    --secondary: #2d4253;
+    --primary: #2e1114;
+    --secondary: #501b1d;
 }
 
 .theme-light {
-    --primary: #635367;
-    --secondary: #917c91;
+    --primary: #1a1a1d;
+    --secondary: #4e4e50;
 }
 
 * {
@@ -18,7 +18,7 @@
 }
 
 *:focus {
-    outline: none;
+    appearance: none;
 }
 
 body {
