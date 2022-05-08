@@ -59,3 +59,12 @@
     justify-content: center;
     font-size: 3vw;
 }
+
+.accordion {
+    overflow: hidden;
+    transition: 0.2s;
+}
+
+.summary {
+    cursor: pointer;
+}

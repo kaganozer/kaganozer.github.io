@@ -19,9 +19,8 @@ class Accordion {
       this.summary = el.querySelector(".summary");
       this.content = el.querySelector(".content");
 
-      this.isClosed = true;
-      this.el.style.overflow = "hidden";
       this.el.style.height = `${this.summary.offsetHeight}px`;
+      this.isClosed = true;
       this.summary.addEventListener("click", e => this.onClick(e));
   }
 
