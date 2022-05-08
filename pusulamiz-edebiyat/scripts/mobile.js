@@ -14,28 +14,25 @@ document.querySelector("#mobileTheme").addEventListener("change", function(){
 
 
 class Accordion {
-  constructor(el) {
-      this.el = el;
-      this.summary = el.querySelector(".summary");
-      this.content = el.querySelector(".content");
+    constructor(el) {
+        this.el = el;
+        this.summary = el.querySelector(".summary");
+        this.content = el.querySelector(".content");
 
-      this.el.style.height = `${this.summary.offsetHeight}px`;
-      this.isClosed = true;
-      this.summary.addEventListener("click", e => this.onClick(e));
-  }
+        this.isClosed = true;
+        this.el.style.height = `${this.summary.offsetHeight}px`;
+        this.summary.addEventListener("click", e => this.onClick(e));
+    }
 
-  onClick(e) {
-      e.preventDefault();
-      if (this.isClosed) {
-          this.el.style.height = `${this.summary.offsetHeight + this.content.offsetHeight}px`
-          this.isClosed = false;
-      } else {
-          this.el.style.height = `${this.summary.offsetHeight}px`
-          this.isClosed = true;
-      }
-  }
+    onClick(e) {
+        if (this.isClosed) {
+            this.el.style.height = `${this.summary.offsetHeight + this.content.offsetHeight}px`
+            this.isClosed = false;
+            this.el.setAttribute("open", true);
+        } else {
+            this.el.style.height = `${this.summary.offsetHeight}px`
+            this.isClosed = true;
+            this.el.removeAttribute("open");
+        }
+    }
 }
-
-document.querySelectorAll(".accordion").forEach((el) => {
-  new Accordion(el);
-})

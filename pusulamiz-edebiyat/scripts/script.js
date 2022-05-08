@@ -1,8 +1,8 @@
 /*
 <div id="ilceler">
     <li class="ilce" id="aliaga">
-        <details>
-            <summary>Aliağa</summary>
+        <div class="accordion">
+            <div class="summary">Aliağa</div>
             <div class="content">
                 <li>
                     <a href="#" class="yazar" id="attila-ilhan">
@@ -25,10 +25,12 @@ Object.keys(ilceler).forEach((ilce) => {
     const ilceLi = document.createElement("li");
     ilceLi.id = ilceler[ilce]["id"];
     ilceLi.classList.toggle("ilce");
-    const details = document.createElement("details");
-    const summary = document.createElement("summary");
+    const accordion = document.createElement("div");
+    accordion.classList.toggle("accordion");
+    const summary = document.createElement("div");
+    summary.classList.toggle("summary");
     summary.innerHTML = ilce;
-    details.appendChild(summary);
+    accordion.appendChild(summary);
     const content = document.createElement("div");
     content.classList.toggle("content");
     Object.keys(ilceler[ilce]["yazarlar"]).forEach((yazar) => {
@@ -50,8 +52,9 @@ Object.keys(ilceler).forEach((ilce) => {
         yazarLi.appendChild(a);
         content.appendChild(yazarLi);
     })
-    details.appendChild(content);
-    ilceLi.appendChild(details);
+    accordion.appendChild(content);
+    ilceLi.appendChild(accordion);
     ilcelerDiv.append(ilceLi);
+    new Accordion(accordion);
 })
 
