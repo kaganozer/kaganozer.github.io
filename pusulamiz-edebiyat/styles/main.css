@@ -18,7 +18,7 @@
 }
 
 *:focus {
-    appearance: none;
+    outline: none;
 }
 
 body {

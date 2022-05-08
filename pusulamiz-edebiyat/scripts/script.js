@@ -38,7 +38,7 @@ Object.keys(ilceler).forEach((ilce) => {
         a.id = ilceler[ilce]["yazarlar"][yazar]["id"];
         a.classList.toggle("yazar");
         const img = document.createElement("img");
-        img.src = `../imgs/${ilceler[ilce]["yazarlar"][yazar]["id"]}.png`;
+        img.src = `imgs/${ilceler[ilce]["yazarlar"][yazar]["id"]}.png`;
         img.alt = yazar;
         a.appendChild(img);
         const yazarInfo = document.createElement("div");
