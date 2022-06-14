@@ -29,6 +29,7 @@
     justify-content: center;
     font-size: 1.5rem;
     border-radius: 25px 25px 0 0;
+    list-style: none;
 }
 
 .ilce details > .content {
