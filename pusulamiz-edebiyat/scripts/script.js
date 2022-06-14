@@ -18,7 +18,80 @@
     ...
 */
 
-import ilceler from './data.json' assert {type: 'json'};
+const ilceler = {
+    "Bayraklı": {
+        "id": "bayrakli",
+        "yazarlar": {
+            "Homeros": {
+                "id": "homeros",
+                "info": "Homeros, Antik Çağ'da yaşamış İyonyalı ozan.",
+                "eserler": []
+            }
+        }
+    },
+    "Çiğli": {
+        "id": "cigli",
+        "yazarlar": {
+            "Hidayet Karakuş": {
+              "id": "hidayet-karakus",
+              "info": "",
+              "eserler": []
+            }
+        }
+    },
+    "Karabağlar": {
+        "id": "karabaglar",
+        "yazarlar": {
+            "Reşat Nuri Güntekin": {
+              "id": "resat-nuri",
+              "info": "Reşat Nuri Güntekin, Türk roman, öykü ve oyun yazarıdır.",
+              "eserler": []
+            }
+        }
+    },
+    "Karşıyaka": {
+        "id": "karsiyaka",
+        "yazarlar": {
+            "Attila İlhan": {
+              "id": "attila-ilhan",
+              "info": "Attilâ İlhan, Türk şair, romancı, düşünür, deneme yazarı, gazeteci, senarist ve eleştirmen.",
+              "eserler": []
+            },
+            "İhsan Oktay Anar": {
+              "id": "ihsan-oktay",
+              "info": "",
+              "eserler": []
+            },
+            "Veysel Çolak": {
+              "id": "veysel-colak",
+              "info": "",
+              "eserler": []
+            }
+        }
+    },
+    "Urla": {
+        "id": "urla",
+        "yazarlar": {
+            "Necati Cumalı": {
+              "id": "necati-cumali",
+              "info": "",
+              "eserler": []
+            },
+            "Neyzen Tevfik": {
+              "id": "neyzen-tevfik",
+              "info": "",
+              "eserler": []
+            },
+            "Yorgos Seferis": {
+              "id": "yorgos-seferis",
+              "info": "",
+              "eserler": []
+            }
+        }
+    }
+};
+
+// import ilceler from "./data.json" assert {type: "json"};
 const ilcelerDiv = document.querySelector("#ilceler");
 
 Object.keys(ilceler).forEach((ilce) => {
