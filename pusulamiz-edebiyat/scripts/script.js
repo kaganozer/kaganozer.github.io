@@ -1,8 +1,8 @@
 /*
 <div id="ilceler">
     <li class="ilce" id="aliaga">
-        <div class="accordion">
-            <div class="summary">Aliağa</div>
+        <details>
+            <summary>Aliağa</summary>
             <div class="content">
                 <li>
                     <a href="#" class="yazar" id="attila-ilhan">
@@ -23,38 +23,31 @@ const ilcelerDiv = document.querySelector("#ilceler");
 
 Object.keys(ilceler).forEach((ilce) => {
     const ilceLi = document.createElement("li");
-    ilceLi.id = ilceler[ilce]["id"];
     ilceLi.classList.toggle("ilce");
-    const accordion = document.createElement("div");
-    accordion.classList.toggle("accordion");
-    const summary = document.createElement("div");
-    summary.classList.toggle("summary");
+    ilceLi.id = ilceler[ilce]["id"];
+    const details = document.createElement("details");
+    const summary = document.createElement("summary");
     summary.innerHTML = ilce;
-    accordion.appendChild(summary);
+    details.appendChild(summary);
     const content = document.createElement("div");
     content.classList.toggle("content");
     Object.keys(ilceler[ilce]["yazarlar"]).forEach((yazar) => {
         const yazarLi = document.createElement("li");
-        const a = document.createElement("a");
-        a.href = "#"; // yazar["id"].html || wikipedia
-        a.id = ilceler[ilce]["yazarlar"][yazar]["id"];
-        a.classList.toggle("yazar");
-        const img = document.createElement("img");
-        img.src = `imgs/${ilceler[ilce]["yazarlar"][yazar]["id"]}.png`;
-        img.alt = yazar;
-        a.appendChild(img);
+        const yazarA = document.createElement("a");
+        yazarA.href = "#"; yazarA.classList.toggle("yazar"); yazarA.id = ilceler[ilce]["yazarlar"][yazar]["id"];
+        const yazarImg = document.createElement("img")
+        yazarImg.src = `imgs/${yazarA.id}.png`; yazarImg.alt = yazar;
+        yazarA.appendChild(yazarImg);
         const yazarInfo = document.createElement("div");
         yazarInfo.classList.toggle("yazar-info");
-        const yazarIsim = document.createElement("h2");
-        yazarIsim.innerHTML = yazar;
-        yazarInfo.appendChild(yazarIsim);
-        a.appendChild(yazarInfo);
-        yazarLi.appendChild(a);
-        content.appendChild(yazarLi);
+        const yazarH2 = document.createElement("h2");
+        yazarH2.innerHTML = yazar;
+        yazarInfo.appendChild(yazarH2);
+        yazarA.appendChild(yazarInfo);
+        yazarLi.appendChild(yazarA);
+        content.appendChild(yazarLi);    
     })
-    accordion.appendChild(content);
-    ilceLi.appendChild(accordion);
-    ilcelerDiv.append(ilceLi);
-    new Accordion(accordion);
+    details.appendChild(content);
+    ilceLi.appendChild(details);
+    ilcelerDiv.appendChild(ilceLi);
 })
-

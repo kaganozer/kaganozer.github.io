@@ -1,11 +1,11 @@
 .theme-dark {
-    --primary: #2e1114;
-    --secondary: #501b1d;
+    --primary: #27020a;
+    --secondary: #4b050d;
 }
 
 .theme-light {
-    --primary: #1a1a1d;
-    --secondary: #4e4e50;
+    --primary: #1a1a1d ;
+    --secondary: #28283a ;
 }
 
 * {

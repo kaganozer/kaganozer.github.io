@@ -168,3 +168,8 @@ label[for="mobileTheme"]::before {
     background-color: var(--primary);
     z-index: 1;
 }
+
+#kagan {
+    position: absolute;
+    bottom: 100px;
+}

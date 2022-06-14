@@ -20,6 +20,8 @@ class Accordion {
         this.content = el.querySelector(".content");
 
         this.isClosed = true;
+        this.summary.offsetHeight = 50;
+        console.log(this.summary.offsetHeight);
         this.el.style.height = `${this.summary.offsetHeight}px`;
         this.summary.addEventListener("click", e => this.onClick(e));
     }
