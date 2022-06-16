@@ -1,0 +1,112 @@
+* {
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+}
+
+a {
+    text-decoration: none;
+    color: #000;
+}
+
+header {
+    height: 100px;
+    width: 100%;
+    background-color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: sticky;
+    top: 0;
+}
+
+#navbar {
+    width: min(1000px, 100%);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#logos a img {
+    height: 75px;
+}
+
+#links {
+    display: flex;
+}
+
+.dropdown {
+    overflow: hidden;
+}
+
+.dropbtn {
+    margin: 0 15px;
+    cursor: pointer;
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    width: 200px;
+    box-shadow: 0 8px 16px 0 #00000033;
+}
+
+.dropdown-content a {
+    text-align: left;
+    padding: 10px 15px;
+}
+
+.dropdown-content a:not(:last-child)::after {
+    content: "";
+    position: relative;
+    bottom: -10px;
+    display: block;
+    width: 100%;
+    height: 1px;
+    background-color: #00000033;
+    transform: scaleX(0);
+    transition: 0.2s;
+}
+
+.dropdown-content a:not(:last-child):hover::after{
+    transform: scaleX(0.8);
+}
+
+.dropdown:hover .dropdown-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.parallax-title {
+    width: 100%;
+    height: 500px;
+
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.parallax-content {
+    text-align: justify;
+    width: calc(100% - 500px);
+    padding: 25px 50px;
+    margin: 25px auto;
+    border-left: 5px solid black;
+}
+
+footer {
+    width: 100%;
+    height: 250px;
+    background-color: #000;
+    color: #fff;
+    display: grid;
+    place-items: center;
+}
