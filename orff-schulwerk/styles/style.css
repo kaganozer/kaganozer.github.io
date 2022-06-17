@@ -11,13 +11,13 @@ section {
 
 #orff {
     width: 1000px;
-    height: 750px;
-    margin: 50px;
+    height: 600px;
+    margin-top: 50px;
 }
 
 #project {
     margin: 50px auto;
-    width: 1000px;
+    width: 800px;
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto;
