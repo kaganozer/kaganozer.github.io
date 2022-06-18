@@ -30,3 +30,30 @@ section {
 #project > div:nth-child(1) {grid-area: div1;}
 #project > div:nth-child(2) {grid-area: div2;}
 #project > div:nth-child(3) {grid-area: div3;}
+
+#project div li {list-style-type: none;}
+
+#project div li img {
+    border-radius: 5px;
+    height: 10px;
+    margin: 0 10px;
+    clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+}
+
+#project div a:hover + img {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+}
+
+#project div a::before {
+    content: "";
+    display: inline-block;
+    position: relative;
+    top: -5px;
+    width: 5px;
+    height: 5px;
+    background-color: var(--primary-color);
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+#project div a:hover::before {width: 10px;}

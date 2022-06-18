@@ -1,6 +1,11 @@
+:root {
+    --primary-color: #02122e;
+}
+
 * {
     margin: 0;
     font-family: "Poppins", sans-serif;
+    color: var(--primary-color);
 }
 
 *, *::before, *::after {
@@ -9,7 +14,6 @@
 
 a {
     text-decoration: none;
-    color: #000;
 }
 
 header {
@@ -21,6 +25,8 @@ header {
     align-items: center;
     position: sticky;
     top: 0;
+    box-shadow: 0 -4px 16px 0 var(--primary-color);
+    z-index: 1;
 }
 
 #navbar {
@@ -56,7 +62,7 @@ header {
     left: -10px;
     height: 16px;
     width: 2px;
-    background-color: #000;
+    background-color: var(--primary-color);
     transform: scaleY(0);
 }
 
@@ -69,7 +75,7 @@ header {
     position: absolute;
     background-color: #fff;
     width: 200px;
-    box-shadow: 0 10px 16px 0 #00000033;
+    box-shadow: 0 10px 10px 0 #0003;
     border-radius: 0 0 25px 0;
 }
 
@@ -90,12 +96,12 @@ header {
     display: block;
     width: 100%;
     height: 1px;
-    background-color: #00000033;
+    background-color: #0003;
     transform: scaleX(0);
 }
 
 .dropdown-content a:not(:last-child):hover::after{
-    transform: scaleX(0.8);
+    transform: scaleX(0.8) translateX(-10px);
 }
 
 .dropdown:hover .dropdown-content {
@@ -112,25 +118,54 @@ header {
     background-repeat: no-repeat;
     background-size: cover;
 
-    color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 2rem;
 }
+
+.parallax-title *{
+    color: #fff;
+    text-shadow: 0 8px 16px black;
+}
+
+.parallax-title p {
+    display: flex;
+    align-items: center;
+}
+
+.parallax-title p img {
+    height: 30px;
+    margin-left: 15px;
+    clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+}
+
+.parallax-title p:hover img {clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);}
 
 .parallax-content {
     text-align: justify;
     width: calc(100% - 500px);
     padding: 25px 50px;
     margin: 25px auto;
-    border-left: 5px solid black;
+    border-left: 5px solid var(--primary-color);
 }
 
 footer {
     width: 100%;
-    height: 250px;
-    background-color: #000;
+    height: 200px;
+    background-color: var(--primary-color);
     color: #fff;
-    display: grid;
-    place-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+}
+
+footer * {color: #fff;}
+
+footer img {
+    height: 50px;
+    width: 75px;
+    margin: 10px;
 }
