@@ -2,6 +2,6 @@
 
 A web page containing my html projects
 
-GRLO
-Pusulamiz Edebiyat
+GRLO <br/>
+Pusulamiz Edebiyat <br/>
 Orff-Schulwerk for Inclusion
