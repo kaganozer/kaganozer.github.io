@@ -169,3 +169,9 @@ footer img {
     width: 75px;
     margin: 10px;
 }
+
+footer::after {
+    content: "Made by Hamza Kağan Özer";
+    font-size: 0.75rem;
+    margin-top: 10px;
+}
