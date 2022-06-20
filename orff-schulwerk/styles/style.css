@@ -6,7 +6,6 @@ section {
 
 #background {
     background-image: url("https://i.pinimg.com/236x/6d/81/bc/6d81bcbce6c04740cc2292ec1bc526f5.jpg");
-    font-size: 2rem;
 }
 
 #orff {
@@ -26,7 +25,7 @@ section {
         "div2 div3"
 }
 
-#project > div {margin: 15px 0;}
+#project > div {margin: 15px 0;}   
 #project > div:nth-child(1) {grid-area: div1;}
 #project > div:nth-child(2) {grid-area: div2;}
 #project > div:nth-child(3) {grid-area: div3;}
@@ -36,11 +35,10 @@ section {
 #project div li img {
     border-radius: 5px;
     height: 10px;
-    margin: 0 10px;
-    clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
 }
+#project div li :is(img, i) {margin: 0 10px; clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);}
 
-#project div a:hover + img {
+#project div a:hover + :is(img, i) {
     clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
 }
 

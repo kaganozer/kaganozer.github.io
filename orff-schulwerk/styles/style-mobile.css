@@ -1,0 +1,10 @@
+#orff {
+    width: 90%;
+    height: auto;
+}
+
+#project{
+    width: auto;
+    display: flex;
+    flex-direction: column;
+}

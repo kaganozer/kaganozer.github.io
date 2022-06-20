@@ -1,0 +1,127 @@
+.desktop {display: none !important;}
+
+header {
+    height: 75px;
+}
+
+nav.mobile {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+#logosMob a img {
+    height: 50px;
+}
+
+#hamBtn {display: none}
+
+#hamBtn ~ label[for="hamBtn"] {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+#hamBtn ~ label[for="hamBtn"] div {
+    width: 20px;
+    height: 2px;
+    border-radius: 5px;
+    margin: 2px;
+    background-color: var(--primary-color);
+    transform-origin: left;
+}
+
+#hamBtn:checked ~ label[for="hamBtn"] div:nth-child(1) {transform: rotate(45deg);}
+#hamBtn:checked ~ label[for="hamBtn"] div:nth-child(2) {transform: scaleX(0);}
+#hamBtn:checked ~ label[for="hamBtn"] div:nth-child(3) {transform: rotate(-45deg);}
+
+#linksMob {
+    position: fixed;
+    bottom: 0; left: 0;
+    width: 100%;
+    height: calc(100% - 75px);
+    transform: translateX(-100%);
+    background-color: #fff;
+    /* border-top: 2px solid var(--primary-color); */
+}
+
+#hamBtn:checked ~ #linksMob {transform: translateX(0);}
+
+#linksMob h1 {
+    margin: 15px;
+    padding: 10px 0;
+    padding-bottom: 25px;
+    border-bottom: 1px solid var(--primary-color);
+}
+
+.dropD {
+    width: min(50%, 300px);
+    margin: 10px 15px;
+    background-color: var(--primary-color);
+    border-radius: 0 0 20px 0;
+    padding: 10px;
+    transform: translateX(calc(-100% - 20px));
+}
+.dropD:nth-child(2) {margin-top: 20px;}
+.dropD, .dropD * {color: #fff;}
+#hamBtn:checked ~ #linksMob .dropD {transform: translateX(0);}
+#hamBtn:checked ~ #linksMob .dropD:nth-child(2) {transition-delay: 0.1s;}
+#hamBtn:checked ~ #linksMob .dropD:nth-child(3) {transition-delay: 0.2s;}
+#hamBtn:checked ~ #linksMob .dropD:nth-child(4) {transition-delay: 0.3s;}
+#hamBtn:checked ~ #linksMob .dropD:nth-child(5) {transition-delay: 0.4s;}
+#hamBtn:checked ~ #linksMob .dropD:nth-child(6) {transition-delay: 0.5s;}
+#hamBtn:checked ~ #linksMob .dropD:nth-child(7) {transition-delay: 0.6s;}
+
+#kagan {
+    background-color: transparent;
+    color: var(--primary-color);
+    border-radius: 0 20px 0 0;
+    position: absolute;
+    bottom: 50px;
+}
+#kagan::after {background-color: var(--primary-color) !important;}
+
+details.dropD > summary::after, #kagan::after {
+    content: "";
+    position: relative;
+    top: 5px;
+    display: block;
+    width: 75%;
+    height: 1px;
+    background-color: #fff;
+}
+details.dropD[open] > summary::after {width: 0;}
+
+details.dropD > summary {list-style: none;}
+
+.dropC {
+    padding: 0 15px;
+    display: flex;
+    flex-direction: column;
+    margin-top: 5px;
+}
+
+.dropC a {margin: 5px 0;}
+.dropC a:not(:last-child)::after {
+    content: "";
+    position: relative;
+    top: 5px;
+    display: block;
+    width: 100%;
+    height: 1px;
+    background-color: #fff;
+}
+
+.parallax-title {
+    width: 100%;
+    font-size: 1.25rem;
+    background-attachment: scroll;
+}
+
+.parallax-content {
+    width: calc(100% - 100px);
+    border-left: none;
+}

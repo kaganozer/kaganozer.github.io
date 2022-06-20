@@ -6,13 +6,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="imgs/orff-logo.jpg">
     <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/mobile.css" media="screen and (max-width: 768px)">
     <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/style-mobile.css" media="screen and (max-width: 1023px)">
     <link href="https://fonts.googleapis.com/css?family=Poppins:100,100italic,200,200italic,300,300italic,regular,italic,500,500italic,600,600italic,700,700italic,800,800italic,900,900italic" rel="stylesheet" />
     <title>Orff-Schulwerk for Inclusion</title>
 </head>
 <body>
     <header>
-        <nav id="navbar">
+        <nav class="mobile">
+            <input type="checkbox" id="hamBtn">
+            <label for="hamBtn">
+                <div></div><div></div><div></div>
+            </label>
+            <div id="logosMob">
+                <a href="./"><img src="imgs/erasmus-logo.jpg" alt="Erasmus Logo"></a>
+                <a href="./"><img src="imgs/orff-logo.jpg" alt="Orff Logo"></a>
+            </div>
+            <div id="linksMob">
+                <h1>Orff-Schulwerk<br> for Inclusion</h1>
+                <details class="dropD">
+                    <summary>Our Project</summary>
+                    <div class="dropC">
+                        <a href="our-project/about">About Our Project</a>
+                        <a href="our-project/what-is-orff">What is Orff-Schulwerk Musical Approach</a>
+                    </div>
+                </details>
+                <details class="dropD">
+                    <summary>Mobilities</summary>
+                    <div class="dropC">
+                        <a href="mobilities/berlin/">Berlin</a>
+                        <a href="mobilities/kavala/">Kavala</a>
+                        <a href="mobilities/izmir/">Izmir</a>
+                    </div>
+                </details>
+                <details class="dropD">
+                    <summary>Partners</summary>
+                    <div class="dropC">
+                        <a href="partners/germany/">Germany</a>
+                        <a href="partners/greece/">Greece</a>
+                        <a href="partners/turkey/">Turkey</a>
+                    </div>
+                </details>
+                <div class="dropD">
+                    <a href="social-media/">Social Media</a>
+                </div>
+                <div class="dropD">
+                    <a href="gallery/">Gallery</a>
+                </div>
+                <div class="dropD" id="kagan">Hamza Kağan Özer</div>
+            </div>
+        </nav>
+        <nav id="navbar" class="desktop">
             <div id="logos">
                 <a href="./"><img src="imgs/erasmus-logo.jpg" alt="Erasmus Logo"></a>
                 <a href="./"><img src="imgs/orff-logo.jpg" alt="Orff Logo"></a>    
@@ -26,11 +71,11 @@
                     </div>
                 </div>
                 <div class="dropdown">
-                    <div class="dropbtn">Activities</div>
+                    <div class="dropbtn">Mobilities</div>
                     <div class="dropdown-content">
-                        <a href="">Berlin</a>
-                        <a href="">Kavala</a>
-                        <a href="">Izmir</a>
+                        <a href="mobilities/berlin/">Berlin</a>
+                        <a href="mobilities/kavala/">Kavala</a>
+                        <a href="mobilities/izmir/">Izmir</a>
                     </div>
                 </div>
                 <div class="dropdown">
@@ -41,11 +86,21 @@
                         <a href="partners/turkey/">Turkey</a>
                     </div>
                 </div>
+                <div class="dropdown">
+                    <div class="dropbtn">
+                        <a href="social-media/">Social Media</a>
+                    </div>
+                </div>
+                <div class="dropdown" id="gallery">
+                    <div class="dropbtn">
+                        <a href="gallery/">Gallery</a>
+                    </div>
+                </div>
             </div>
         </nav>
     </header>
     <section>
-        <div class="parallax-title" id="background"><h1>Orff-Schulwerk for Inclusion</h1></div>
+        <div class="parallax-title" id="background"><h1>Orff-Schulwerk <br class="mobile">for Inclusion</h1></div>
         <img src="imgs/orff.jpg" id="orff" alt="Orff-Schulwerk for Inclusion">
         <div id="project">
             <div>
@@ -54,16 +109,22 @@
                 <li><a href="our-project/what-is-orff/">What is Orff-Schulwerk Musical Approach</a></li>
             </div>
             <div>
-                <h1>Activites</h1>
-                <li><a href="">Berlin</a></li>
-                <li><a href="">Kavala</a></li>
-                <li><a href="">Izmir</a></li>
+                <h1>Mobilities</h1>
+                <li><a href="mobilities/berlin/">Berlin</a></li>
+                <li><a href="mobilities/kavala/">Kavala</a></li>
+                <li><a href="mobilities/izmir/">Izmir</a></li>
             </div>
             <div>
                 <h1>Partners</h1>
                 <li><a href="partners/germany/">Germany</a><img src="imgs/flag-germany.jpg" alt="German Flag" id="icon_ge"></li>
                 <li><a href="partners/greece/">Greece</a><img src="imgs/flag-greece.jpg" alt="Greece Flag" id="icon_gr"></li>
                 <li><a href="partners/turkey/">Turkey</a><img src="imgs/flag-turkey.jpg" alt="Turkey Flag" id="icon_tr"></li>
+            </div>
+            <div>
+                <h1>Social Media</h1>
+                <li><a href="https://www.instagram.com/orffschulwerkforinclusion">Instagram</a><i class="fa fa-instagram"></i></li>
+                <li><a href="https://www.twitter.com/OrfForInclusion">Twitter</a><i class="fa fa-twitter"></i></li>
+                <li><a href="https://www.facebook.com/Orff-Schulwerk-for-Inclusion-102847979066993">Facebook</a><i class="fa fa-facebook"></i></li>
             </div>
         </div>
     </section>
