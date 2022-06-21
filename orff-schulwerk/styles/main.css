@@ -181,10 +181,12 @@ footer img {
     margin: 10px;
 }
 
-footer::after {
-    content: "Made by Hamza Kağan Özer";
-    font-size: 0.75rem;
-    margin-top: 10px;
+@media only screen and (min-width: 769px) {
+    footer::after {
+        content: "Made by Hamza Kağan Özer";
+        font-size: 0.75rem;
+        margin-top: 10px;
+    }
 }
 
 #links div.dropdown:nth-child(5) {display: none;}

@@ -120,6 +120,8 @@ details.dropD > summary {list-style: none;}
     font-size: 1.25rem;
     background-attachment: scroll;
 }
+.parallax-title div p img {height: 1.25rem;} /* For Partner Pages */
+.parallax-title * {text-shadow: 0 4px 8px black;}
 
 .parallax-content {
     width: calc(100% - 100px);
