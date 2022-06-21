@@ -190,3 +190,54 @@ footer img {
 }
 
 #links div.dropdown:nth-child(5) {display: none;}
+
+.gallery-cnt {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.gallery {
+    width: 800px;
+    height: 500px;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: var(--primary-color);
+}
+
+.gallery-imgs {
+    /* width: 200%; depends on image amount */
+    height: 500px;
+    display: flex;
+}
+.gallery-imgs input {display: none;}
+
+.slide {
+    /* width: 50%; depends on image amount */
+    display: flex;
+    justify-content: center;
+}
+
+/* gallery-imgs.width * slide.width = 1 */
+
+.slide img {
+    height: 500px;
+    width: auto;
+}
+
+.gallery-nav {
+    position: absolute;
+    width: 800px;
+    margin-top: -40px;
+    display: flex;
+    justify-content: center;
+}
+
+.gallery-nav label {
+    border: 2px solid var(--primary-color);
+    padding: 5px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+.gallery-nav label:not(:last-child) {margin-right: 40px;}
+.gallery-nav label:hover {background-color: var(--primary-color);}
