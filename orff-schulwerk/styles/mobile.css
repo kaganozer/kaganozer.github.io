@@ -60,6 +60,7 @@ nav.mobile {
 .dropD {
     width: min(50%, 300px);
     margin: 10px 15px;
+    background: linear-gradient(145deg, #0e3a88 10%, #02122e 100%);
     background-color: var(--primary-color);
     border-radius: 0 0 20px 0;
     padding: 10px;
@@ -76,6 +77,7 @@ nav.mobile {
 #hamBtn:checked ~ #linksMob .dropD:nth-child(7) {transition-delay: 0.6s;}
 
 #kagan {
+    background: transparent;
     background-color: transparent;
     color: var(--primary-color);
     border-radius: 0 20px 0 0;

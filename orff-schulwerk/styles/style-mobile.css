@@ -4,7 +4,10 @@
 }
 
 #project{
-    width: auto;
-    display: flex;
-    flex-direction: column;
+    width: min(500px, 90%);
+}
+
+#project, #project * {
+    text-align: left;
+    font-size: 1rem;
 }
