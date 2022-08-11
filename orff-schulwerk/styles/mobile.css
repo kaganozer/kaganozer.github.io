@@ -131,17 +131,3 @@ details.dropD > summary {list-style: none;}
 }
 
 .parallax-content, .parallax-content * {font-size: 0.9rem;}
-
-.gallery {
-    width: min(100%, 500px);
-    height: 250px;
-}
-
-.gallery-imgs {height: 250px;}
-
-.slide img {height: 250px;}
-
-.gallery-nav {
-    width: min(calc(100% - 100px), 500px);
-    margin-top: -30px;
-}

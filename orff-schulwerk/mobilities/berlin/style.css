@@ -2,9 +2,17 @@
     background-image: url("https://i.pinimg.com/236x/67/df/87/67df872b61fc1bebe1c1b9ecf8f39893.jpg");
 }
 
-.gallery-imgs {width: 200%;}
+.gallery {
+    width: min(100%, 800px);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;
+}
 
-.slide {width: 50%;}
+.gallery img {
+    height: 400px;
+}
 
-#radio1:checked ~ .first {margin-left: 0;}
-#radio2:checked ~ .first {margin-left: -50%;}
+@media screen and (max-width: 768px) {
+    .gallery img {width: 100%; height: auto;}
+}
