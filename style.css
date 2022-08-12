@@ -1,0 +1,239 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@300;400;500&display=swap');
+
+:root {
+    --primary-color: #050e43;
+    --secondary-color: #75bce8;
+}
+
+*, *::before, *::after
+{margin: 0; transition: 0.2s ease;}
+a {text-decoration: none; color: inherit;}
+
+html, body {height: 100%;}
+
+#main {
+    width: 100%;
+    height: 100%;
+    background-color: var(--primary-color);
+    display: grid;
+    grid-template: 1fr 1fr / 1fr 1fr;
+    font-family: "Source Code Pro";
+}
+
+#main > div:not(#accounts) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+#main > div.dark-d *::selection {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+}
+
+#main > div.light-d *::selection {
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+}
+
+#photo, #github {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+}
+
+#name, #info {
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+}
+
+#photo {text-align: center;}
+
+#photo a.img-card {
+    width: 150px; height: 180px;
+    border-radius: 15px;
+    background-color: var(--primary-color);
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+}
+
+#photo a.img-card .img {
+    width: 100%; height: 150px;
+}
+
+#photo a.img-card .img img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+}
+
+#photo a.img-card .img-info {
+    width: 100%; height: 30px;
+    display: flex; gap: 5px;
+    justify-content: center;
+    align-items: center;
+    color: var(--secondary-color);
+    position: absolute;
+    bottom: 0;
+}
+
+#photo a.img-card:hover {transform: scale(1.2);}
+#photo a.img-card:hover .img {height: 100%;}
+
+#name div h1 {
+    text-transform: uppercase;
+    position: relative;
+    display: flex; align-items: center;
+}
+
+#name div h1:last-child::after {
+    content: "";
+    position: absolute;
+    right: 10px;
+    width: 4px; height: 80%;
+    background-color: #fff;
+    box-shadow: 0 0 15px var(--secondary-color);
+    animation: fade 1s infinite;
+}
+
+#name div h1 span:hover, #info li:hover span:nth-child(2) {
+    color: #fff;
+    text-shadow: 0 0 10px var(--secondary-color);
+}
+
+@keyframes fade {
+    0%, 24%, 75%, 100% {opacity: 1;}
+    25%, 74% {opacity: 0;}
+}
+
+@media screen and (min-width: 426px) {
+    #accounts {
+        display: flex; gap: 15px;
+        flex-direction: column;
+        position: absolute;
+        bottom: 0; right: 0;
+        overflow: hidden;
+    }
+
+    #accounts a {
+        height: 32px;
+        color: var(--primary-color);
+    }
+
+    #accounts a {
+        display: flex;
+        transform: translateX(100%) translateX(-32px);
+        font-size: 1.25rem;
+    }
+
+    #accounts a:hover {transform: translateX(0); text-decoration: none;}
+
+    #accounts a span {display: grid; place-items: center;}
+    #accounts a span:first-child {width: 32px;}
+}
+
+#info div li {
+    list-style-type: none;
+    display: flex; flex-wrap: wrap;
+    margin: 2px;
+}
+
+#info div li span {position: relative;}
+
+#info div li span:first-child {
+    width: 25px;
+    display: flex;
+    justify-content: center;
+    margin-right: 10px;
+}
+
+#info div li:hover span:first-child {
+    transform: rotate(-45deg)
+}
+
+#info div li span:nth-child(2)::after {
+    content: "";
+    position: absolute;
+    bottom: -2px; left: 0;
+    width: 100%; height: 1px;
+    background-color: #fff;
+    box-shadow: 0 0 10px var(--secondary-color);
+    transform-origin: left;
+    transform: scaleX(0);
+}
+#info div li:hover span:nth-child(2)::after {
+    transform: scaleX(1);
+}
+
+#github div h3 {
+    display: flex; gap: 10px;
+    align-items: flex-end;
+}
+
+#github div h3 i {
+    transform: translateX(100%);
+    opacity: 0;
+}
+#github:hover div h3 i {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+#github li a {position: relative;}
+#github li a:hover {
+    color: #fff;
+    text-shadow: 0 0 10px var(--primary-color);
+}
+
+#github li a::after {
+    content: "";
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%; height: 1px;
+    background-color: #fff;
+    box-shadow: 0 0 10px var(--primary-color);
+    transform-origin: left;
+    transform: scaleX(0);
+}
+#github li a:hover::after {
+    transform: scaleX(1);
+}
+
+@media screen and (max-width: 425px) {
+    #main {display: block;}
+    #main > div {height: 75%;}
+    #photo {
+        height: 100% !important;
+        flex-direction: column;
+    }
+
+    #accounts {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        margin: 20px;
+    }
+
+    #main > div.dark-m *::selection {
+        background-color: var(--secondary-color);
+        color: var(--primary-color);
+    }
+
+    #main > div.light-m *::selection {
+        background-color: var(--primary-color);
+        color: var(--secondary-color);
+    }
+
+    #photo, #info {
+        background-color: var(--secondary-color);
+        color: var(--primary-color);
+    }
+
+    #name, #github {
+        background-color: var(--primary-color);
+        color: var(--secondary-color);
+    }
+
+    #info::after {background-color: var(--primary-color);}
+}
