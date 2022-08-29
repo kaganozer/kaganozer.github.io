@@ -116,21 +116,17 @@ html, body {height: 100%;}
         overflow: hidden;
     }
 
-    #accounts a {
-        height: 32px;
-        color: var(--primary-color);
-    }
-
-    #accounts a {
+    #accounts li {
+        list-style-type: none;
         display: flex;
-        transform: translateX(100%) translateX(-32px);
+        height: 32px;
         font-size: 1.25rem;
+        color: var(--primary-color);
+        transform: translateX(100%) translateX(-32px);
     }
 
-    #accounts a:hover {transform: translateX(0); text-decoration: none;}
-
-    #accounts a span {display: grid; place-items: center;}
-    #accounts a span:first-child {width: 32px;}
+    #accounts li:hover {transform: translateX(0);}
+    #accounts li span:first-child {width: 32px;}
 }
 
 #info div li {
@@ -168,7 +164,7 @@ html, body {height: 100%;}
 
 #github div h3 {
     display: flex; gap: 10px;
-    align-items: flex-end;
+    align-items: center;
 }
 
 #github div h3 i {
@@ -189,7 +185,7 @@ html, body {height: 100%;}
 #github li a::after {
     content: "";
     position: absolute;
-    bottom: 0; left: 0;
+    bottom: -2px; left: 0;
     width: 100%; height: 1px;
     background-color: #fff;
     box-shadow: 0 0 10px var(--primary-color);

@@ -1,0 +1,192 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+
+:root {
+    --color-dark: #0c5c5e;
+    --color-light: #409c8e;
+}
+
+*, *::before, *::after {transition: 0.2s; margin: 0;}
+
+html, body {height: 100%;}
+
+body {
+    display: grid; place-items: center;
+    color: white; font-family: "Open Sans";
+}
+
+input, input::placeholder, button {color: white; font-family: "Open Sans";}
+:is(input, button, [tabindex="0"]):focus {outline: none;}
+
+.message-app-container {
+    width: 100%; height: 100%;
+    position: relative;
+    display: grid;
+    grid-template-rows: 50px 1fr 60px;
+}
+
+.container-header {
+    position: relative;
+    background-color: var(--color-dark);
+    display: flex; align-items: center;
+    z-index: 1; padding: 0 15px;
+}
+
+.container-header .settings {position: absolute; right: 0;}
+.container-header .settings .dots {
+    width: 50px; height: 50px;
+    display: grid; place-items: center;
+    background-color: inherit; border: none;
+    cursor: pointer; font-size: 1.2rem;
+}
+.container-header .settings .dots.active {background-color: #0003;}
+.container-header .settings .dots.active + .options {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.container-header .settings .options {
+    position: absolute;
+    top: calc(100% + 5px); right: 5px;
+    width: 200px; padding: 10px 0;
+    list-style-type: none;
+    background-color: var(--color-dark);
+    transform-origin: top right;
+    transform: scale(0); opacity: 0;
+}
+.container-header .settings .options li {
+    height: 45px; cursor: pointer;
+    padding: 0 15px;
+    display: flex; align-items: center;
+}
+.container-header .settings .options li:hover {background-color: #0003;}
+
+.container-body {
+    background-color: var(--color-light);
+    position: relative;
+}
+
+.container-body .message-section {
+    overflow: scroll; overflow-x: hidden;
+    height: auto; max-height: 100%;
+    width: 100%;
+    position: absolute; bottom: 0;
+    display: flex; flex-direction: column;
+    gap: 2px;
+    box-sizing: border-box; padding: 10px 50px;
+}
+.container-body .message-section::-webkit-scrollbar {width: 10px;}
+.container-body .message-section::-webkit-scrollbar-track {background-color: transparent;}
+.container-body .message-section::-webkit-scrollbar-thumb {background-color: #0004;}
+
+.container-body .message-section .message-element {
+    width: auto; max-width: 300px;
+    height: auto; word-wrap: break-word;
+    background-color: var(--color-dark);
+    padding: 10px; padding-right: 50px;
+    border-radius: 5px; position: relative;
+    display: flex; flex-direction: column;
+}
+.container-body .message-section .message-element::after {
+    content: attr(data-time);
+    position: absolute;
+    bottom: 0; right: 5px;
+    color: #fffa; font-size: 0.75rem;
+}
+
+.container-body .message-section .message-element .message-username {
+    font-size: 0.8rem; color: var(--color-light);
+}
+
+.container-body .message-section .message-element.message-sent {
+    align-self: flex-end;
+}
+
+.container-body .message-section .message-element.message-received {
+    align-self: flex-start;
+}
+
+.container-body .scroll {
+    width: 50px; height: 50px;
+    border-radius: 100%; cursor: pointer;
+    background-color: var(--color-dark);
+    position: absolute;
+    bottom: 10px; right: 15px;
+    display: grid; place-items: center;
+    transform: scale(0); opacity: 0;
+}
+
+.container-footer {
+    background-color: var(--color-dark);
+    display: grid; align-items: center;
+    grid-template-columns: 50px 50px 1fr 50px;
+    box-sizing: border-box; padding: 5px;
+    position: relative;
+}
+
+.container-footer > span {display: grid; place-items: center;}
+.container-footer > * i {cursor: pointer; transform: scale(1.2);}
+
+.emoji-picker, .show-file-options, .send-message {height: 100%;border-radius: 50%;}
+
+.container-footer .photo-preview {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 10px; padding: 5px;
+    background-color: var(--color-dark);
+    border-radius: 5px;
+}
+
+.container-footer .photo-preview .preview-settings {
+    display: flex; justify-content: flex-end;
+    position: absolute;
+    top: -10px; right: -10px;
+    background-color: var(--color-dark);
+    border-radius: 5px;
+}
+
+.container-footer .photo-preview .preview-settings > span {
+    width: 30px; height: 30px;
+    display: grid; place-items: center;
+    cursor: pointer;
+}
+
+.container-footer .photo-preview .preview-settings img {
+    width: 100px; height: 100px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.container-footer .file-attach {position: relative;}
+.container-footer .file-attach .show-file-options {
+    width: 50px; height: 50px;
+    background-color: inherit;
+    border: none;
+}
+.container-footer .file-attach .show-file-options.active {background-color: #0003;}
+.container-footer .file-attach .show-file-options.active + .file-options span label {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+
+.container-footer .file-attach .file-options {
+    position: absolute; bottom: calc(100% + 15px);
+    display: flex; flex-direction: column; gap: 10px;
+}
+
+.container-footer .file-attach .file-options span input {display: none;}
+.container-footer .file-attach .file-options span label {
+    display: grid; place-items: center;
+    width: 50px; height: 50px;
+    border-radius: 50%; cursor: pointer;
+    background-color: var(--color-dark);
+    transform: translateY(10px) scale(0);
+    opacity: 0;
+}
+
+.container-footer input#message-input {
+    height: 40px; padding: 0 10px;
+    border: none; border-radius: 5px;
+    background-color: var(--color-light);
+    font-size: 18px; margin-left: 10px;
+}

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message App</title>
+    <link rel="stylesheet" href="style/style.css">
+    <link rel="stylesheet" href="style/login.css">
+    <script src="https://kit.fontawesome.com/7b173948ba.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="message-app-login">
+        <div class="login-content">
+            <div class="login-title">
+                <h1>Hoşgeldin!</h1>
+                <h3>Uygulamayı kullanmak için giriş yap.</h3>
+            </div>
+            <div class="login-input">
+                <input id="login-name-input" type="text" placeholder="Adınızı girin" autocomplete="off">
+                <div class="login-submit">Giriş yap</div>
+            </div>
+        </div>
+        <div class="login-image">
+            <img src="imgs/login-background.jpg" alt="">
+        </div>
+    </div>
+    <div class="message-app-container" style="display:none;">
+        <div class="container-header">
+            <span class="title"></span>
+            <span class="settings">
+                <button class="dots">
+                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                </button>
+                <span class="options">
+                    <!-- <li>Find</li>
+                    <li>Clear Chat</li> -->
+                    <li>Kağan Özer</li>
+                </span>
+            </span>
+        </div>
+        <div class="container-body">
+            <div class="message-section"></div>
+            <div class="scroll">
+                <i class="fa-solid fa-angle-down"></i>
+            </div>
+        </div>
+        <div class="container-footer">
+            <span class="photo-preview">
+                <span class="preview-settings">
+                    <span class="change-photo">
+                        <label for="photoUpload">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </label>
+                    </span>
+                    <span class="delete-photo">
+                        <i class="fa-solid fa-xmark"></i>
+                    </span>
+                </span>
+            </span>
+            <span class="emoji-picker">
+                <i class="fa-solid fa-face-smile"></i>
+            </span>
+            <span class="file-attach">
+                <button class="show-file-options">
+                    <i class="fa-solid fa-paperclip"></i>
+                </button>
+                <span class="file-options">
+                    <span class="photo-upload">
+                        <input type="file" id="photoUpload" accept="image/*">
+                        <label for="photoUpload">
+                            <i class="fa-solid fa-image"></i>
+                        </label>
+                    </span>
+                    <span class="file-upload" style="display: none;">
+                        <input type="file" id="fileUpload">
+                        <label for="fileUpload">
+                            <i class="fa-solid fa-file"></i>
+                        </label>
+                    </span>
+                </span>
+            </span>
+            <input type="text" placeholder="Mesaj gönderin" autocomplete="off" id="message-input">
+            <span class="send-message">
+                <i class="fa-solid fa-paper-plane"></i>
+            </span>
+        </div>
+    </div>
+
+    <script src="script.js" type="module"></script>
+</body>
+</html
