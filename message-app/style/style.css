@@ -12,6 +12,7 @@ html, body {height: 100%;}
 body {
     display: grid; place-items: center;
     color: white; font-family: "Open Sans";
+    background-color: var(--color-light);
 }
 
 input, input::placeholder, button {color: white; font-family: "Open Sans";}
@@ -60,6 +61,39 @@ input, input::placeholder, button {color: white; font-family: "Open Sans";}
 }
 .container-header .settings .options li:hover {background-color: #0003;}
 
+.container-header .settings .options li input {display: none;}
+.container-header .settings .options li > label {
+    width: 100%; height: 100%;
+    cursor: pointer;
+    display: flex; align-items: center;
+}
+
+.container-header .settings .options li .user-color-picker {
+    position: absolute;
+    top: 0; right: calc(100% + 10px);
+    background-color: var(--color-dark);
+    cursor: default;
+    display: grid; gap: 5px;
+    grid-template-columns: 50px 50px 50px;
+    grid-template-rows: 50px 50px 50px 50px;
+    padding: 5px;
+    transform: scale(0); opacity: 0;
+}
+.container-header .settings .options li .user-color-picker.active {
+    transform: scale(1); opacity: 1;
+}
+.container-header .settings .options li .user-color-picker span {
+    border-radius: 50%; cursor: pointer;
+}
+.container-header .settings .options li .user-color-picker label {
+    padding: 0 10px;
+    display: grid; place-items: center;
+    background-color: white;
+    color: var(--color-dark);
+    cursor: pointer;
+    grid-column: 1 / -1;
+}
+
 .container-body {
     background-color: var(--color-light);
     position: relative;
@@ -72,37 +106,78 @@ input, input::placeholder, button {color: white; font-family: "Open Sans";}
     position: absolute; bottom: 0;
     display: flex; flex-direction: column;
     gap: 2px;
-    box-sizing: border-box; padding: 10px 50px;
+    box-sizing: border-box; padding: 10px min(50px, 5%);
 }
 .container-body .message-section::-webkit-scrollbar {width: 10px;}
 .container-body .message-section::-webkit-scrollbar-track {background-color: transparent;}
 .container-body .message-section::-webkit-scrollbar-thumb {background-color: #0004;}
 
 .container-body .message-section .message-element {
-    width: auto; max-width: 300px;
+    width: auto; max-width: 250px;
     height: auto; word-wrap: break-word;
     background-color: var(--color-dark);
-    padding: 10px; padding-right: 50px;
-    border-radius: 5px; position: relative;
-    display: flex; flex-direction: column;
+    padding: 10px 15px; padding-right: 50px;
+    border-radius: 10px; position: relative;
 }
 .container-body .message-section .message-element::after {
     content: attr(data-time);
     position: absolute;
-    bottom: 0; right: 5px;
+    bottom: 0; right: 8px;
     color: #fffa; font-size: 0.75rem;
 }
 
 .container-body .message-section .message-element .message-username {
     font-size: 0.8rem; color: var(--color-light);
+    grid-area: name;
+}
+.container-body .message-section .message-element .message-content {grid-area: text;}
+
+.container-body .message-section .message-element.message-sent {align-self: flex-end;}
+.container-body .message-section .message-element.message-sent.message-new {border-top-right-radius: 0;}
+.container-body .message-section .message-element.message-sent.message-new::before {
+    content: "";
+    position: absolute;
+    top: 0; right: -14px;
+    width: 15px; height: 15px;
+    background-color: inherit;
+    clip-path: polygon(0 0, 100% 0, 0 100%);
 }
 
-.container-body .message-section .message-element.message-sent {
-    align-self: flex-end;
+.container-body .message-section .message-element.message-received {align-self: flex-start;}
+.container-body .message-section .message-element.message-received.message-new {border-top-left-radius: 0;}
+.container-body .message-section .message-element.message-received.message-new::before {
+    content: "";
+    position: absolute;
+    top: 0; left: -14px;
+    width: 15px; height: 15px;
+    background-color: inherit;
+    clip-path: polygon(0 0, 100% 0, 100% 100%);
 }
 
-.container-body .message-section .message-element.message-received {
-    align-self: flex-start;
+.container-body .message-section .message-element.message-new {
+    display: grid; gap: 5px;
+    grid-template-columns: 30px 1fr;
+    grid-template-rows: 20px 1fr;
+    grid-template-areas:
+        "name name"
+        "photo text";
+    padding-bottom: 15px;
+    margin-top: 10px;
+}
+
+.container-body .message-section .message-element.message-new .message-photo {
+    width: 25px; height: 25px;
+    border-radius: 50%;
+    position: absolute;
+    grid-area: photo;
+    object-fit: cover;
+}
+
+.container-body .message-section .date-element {
+    background-color: var(--color-dark);
+    padding: 5px 10px; border-radius: 5px;
+    color: #fffc;align-self: center;
+    margin: 10px;
 }
 
 .container-body .scroll {
