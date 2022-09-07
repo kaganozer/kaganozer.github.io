@@ -409,6 +409,7 @@ messageInput.addEventListener("keydown", function(e){
 messageDelete.addEventListener("click", function(e){
     const messageId = messageContextMenu.getAttribute("data-message");
     set(ref(database, `messages/${messageId}/deleted`), true);
+    messageContextMenu.classList.remove("active");
 })
 
 

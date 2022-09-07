@@ -104,7 +104,7 @@ input, button {color: white; font-family: "Open Sans";}
 }
 
 .container-body {
-    background-color: var(--color-light);
+    background-color: var(--message-section);
     position: relative;
 }
 
@@ -317,6 +317,7 @@ input, button {color: white; font-family: "Open Sans";}
     background-color: var(--color-dark);
     display: grid; align-items: center;
     grid-template-columns: 50px 50px 1fr 50px;
+    grid-template-areas: "emoji photo input send";
     box-sizing: border-box; padding: 5px;
     position: relative;
     color: var(--color-light);
@@ -366,4 +367,18 @@ input, button {color: white; font-family: "Open Sans";}
 }
 .container-footer input#message-input::placeholder {
     color: var(--color-light);
+}
+
+@media screen and (max-width: 700px) {
+    .container-footer {
+        grid-template-areas: "emoji photo input input";
+    }
+    .container-footer input#message-input {
+        grid-area: input;
+    }
+    .container-footer .send-message {
+        grid-area: input;
+        grid-column: 4 / 5;
+        color: var(--color-dark);
+    }
 }

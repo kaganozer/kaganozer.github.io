@@ -1,17 +1,12 @@
 .message-app-login {
-    width: min(100%, 800px); height: 500px;
-    display: flex; flex-wrap: wrap;
+    width: min(80%, 800px); height: 500px;
+    display: flex;
     align-items: center;
     box-shadow: 10px 10px 30px var(--color-dark);
 }
 
-.message-app-login > div {
-    flex: 1 0 10rem;
-    height: 100%;
-}
-
 .message-app-login .login-content {
-    width: 100%; min-width: 450px;
+    width: 100%; height: 100%;
     background-color: var(--color-dark);
     color: white;
     display: flex; flex-direction: column;
@@ -30,9 +25,10 @@
     width: 100%; height: 30px;
     font-size: 1rem;
 }
+.message-app-login .login-content .login-input input::placeholder {color: white;}
 
 .message-app-login .login-content .login-input .login-submit {
-    width: 90px; height: 40px;
+    width: 5em; height: 2em;
     border: 2px solid white;
     display: grid; place-items: center;
     cursor: pointer;
@@ -42,10 +38,22 @@
 }
 
 .message-app-login .login-image {
-    min-width: 250px;
+    height: 100%;
 }
 
 .message-app-login .login-image img {
-    width: 100%; height: 500px;
+    width: 250px; height: 100%;
     object-fit: cover;
+}
+
+@media screen and (max-width: 700px) {
+    .message-app-login {
+        flex-direction: column;
+        width: min(450px, 80%);
+        font-size: 12px;
+        overflow: hidden;
+    }
+    .message-app-login .login-image, .message-app-login .login-image img {
+        width: 100%;
+    }
 }
