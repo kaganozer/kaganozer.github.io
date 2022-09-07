@@ -1,16 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-app.js";
-import { getDatabase, ref, set, child, remove, get, onValue, onChildAdded, onChildChanged, onChildRemoved } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-database.js";
-
-// Firebase configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyAqgqB2-BFmAhOS1Lq382gIWr-TGRJyICk",
-    authDomain: "message-application-5bb5c.firebaseapp.com",
-    projectId: "message-application-5bb5c",
-    storageBucket: "message-application-5bb5c.appspot.com",
-    messagingSenderId: "887925978609",
-    appId: "1:887925978609:web:a19e9d56a372ec1ac64050",
-    databaseURL: "https://message-application-5bb5c-default-rtdb.europe-west1.firebasedatabase.app/",
-};
+import { getDatabase, ref, set, child, remove, get, onChildAdded, onChildChanged, onChildRemoved } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-database.js";
+import { firebaseConfig } from "./fireabase-config.js";
 
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
@@ -27,14 +17,8 @@ const appTitle = document.querySelector(".title");
 let username;
 let online;
 const status = {
-    "online": {
-        "tr-TR": "Çevrimiçi",
-        "color": "#71eb8d"
-    },
-    "offline": {
-        "tr-TR": "Çevrimdışı",
-        "color": "#616066"
-    }
+    "online": "#71eb8d",
+    "offline": "#616066"
 };
 
 function scroll(el) {el.scrollTop = el.scrollHeight;}
@@ -68,13 +52,14 @@ function login(){
             }
         })
 
+        // TODO: Add onChildAdded for users object so it doesn't have to call every user when a new user logs in
         get(child(dbRef, "users")).then((snapshot) => {
             if (snapshot.exists()){
                 Object.keys(snapshot.val()).forEach(user => {
                     onChildChanged(ref(database, `users/${user}/`), (child) => {
                         if (child.key === "status") {
                             [...document.querySelectorAll(`.message-element[data-user='${user}'] .user-status`)].forEach(el => {
-                                el.style["background-color"] = status[child.val()]["color"];
+                                el.style["background-color"] = status[child.val()];
                             });
                         }
                         if (child.key === "color") {
@@ -231,7 +216,7 @@ function sendMessage(messageId, messageData){
             if (snapshot.exists()) {
                 messageName.style.color = snapshot.val()["color"];
                 userPhoto.src = snapshot.val()["profilePhoto"];
-                userStatus.style["background-color"] = status[snapshot.val()["status"]]["color"];
+                userStatus.style["background-color"] = status[snapshot.val()["status"]];
             }
         })
 
