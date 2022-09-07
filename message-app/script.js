@@ -298,7 +298,7 @@ function sendMessage(messageId, messageData){
         messageSection.insertBefore(dateElement, messageElement);
     }
 
-    if (!messageData["deleted"]) {
+    if (!messageData["deleted"] || !messageElement.classList.contains("deleted")) {
         messageElement.addEventListener("contextmenu", function(e){
             e.preventDefault();
     
