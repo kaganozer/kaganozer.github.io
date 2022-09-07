@@ -1,8 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
 
 :root {
-    --color-dark: #0c5c5e;
-    --color-light: #409c8e;
+    /* --color-dark: #0c5c5e;
+    --color-light: #409c8e; */
+    --color-dark: #3e2d63;
+    --color-light: #a790d7;
+    --message-section: #5d498a;
+    --message-sent: #23163e;
+    --message-received: #352456;
+    --message-input: #684d9a;
 }
 
 *, *::before, *::after {transition: 0.2s; margin: 0;}
@@ -15,7 +21,7 @@ body {
     background-color: var(--color-light);
 }
 
-input, input::placeholder, button {color: white; font-family: "Open Sans";}
+input, button {color: white; font-family: "Open Sans";}
 :is(input, button, [tabindex="0"]):focus {outline: none;}
 
 .message-app-container {
@@ -29,15 +35,18 @@ input, input::placeholder, button {color: white; font-family: "Open Sans";}
     position: relative;
     background-color: var(--color-dark);
     display: flex; align-items: center;
-    z-index: 1; padding: 0 15px;
+    z-index: 3; padding: 0 15px;
 }
 
-.container-header .settings {position: absolute; right: 0;}
+.container-header .settings {
+    position: absolute; right: 0;
+}
 .container-header .settings .dots {
     width: 50px; height: 50px;
     display: grid; place-items: center;
     background-color: inherit; border: none;
     cursor: pointer; font-size: 1.2rem;
+    color: var(--color-light);
 }
 .container-header .settings .dots.active {background-color: #0003;}
 .container-header .settings .dots.active + .options {
@@ -105,6 +114,7 @@ input, input::placeholder, button {color: white; font-family: "Open Sans";}
     width: 100%;
     position: absolute; bottom: 0;
     display: flex; flex-direction: column;
+    background-color: var(--message-section);
     gap: 2px;
     box-sizing: border-box; padding: 10px min(50px, 5%);
 }
@@ -115,9 +125,9 @@ input, input::placeholder, button {color: white; font-family: "Open Sans";}
 .container-body .message-section .message-element {
     width: auto; max-width: 250px;
     height: auto; word-wrap: break-word;
-    background-color: var(--color-dark);
     padding: 10px 15px; padding-right: 50px;
     border-radius: 10px; position: relative;
+    background-color: var(--message-bg);
 }
 .container-body .message-section .message-element::after {
     content: attr(data-time);
@@ -125,14 +135,52 @@ input, input::placeholder, button {color: white; font-family: "Open Sans";}
     bottom: 0; right: 8px;
     color: #fffa; font-size: 0.75rem;
 }
-
-.container-body .message-section .message-element .message-username {
-    font-size: 0.8rem; color: var(--color-light);
-    grid-area: name;
+.container-body .message-section .message-element.reacted {
+    margin-bottom: 12px;
+    padding-bottom: 15px;
 }
+.container-body .message-section .message-element.deleted {
+    display: inline !important;
+    color: #fff9; font-style: italic;
+    margin-bottom: 0;
+}
+
 .container-body .message-section .message-element .message-content {grid-area: text;}
 
-.container-body .message-section .message-element.message-sent {align-self: flex-end;}
+.container-body .message-section .message-element .image-content {
+    width: calc(100% + 35px);
+    max-width: 300px;
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: 5px;
+    cursor: pointer;
+    grid-area: image;
+    margin-bottom: 10px;
+}
+.container-body .message-section .message-element.image .message-content {margin-top: -10px;}
+
+.container-body .message-section .message-element .reaction-element {
+    height: 25px;
+    display: flex; align-items: center;
+    padding: 0 5px;
+    background-color: var(--color-dark);
+    border-radius: 30px;
+    box-shadow: 0 2px 5px var(--message-bg);
+    position: absolute;
+    bottom: -12px; left: 6px;
+    z-index: -1;
+    transform: scale(0);
+}
+.container-body .message-section .message-element .reaction-element.active {transform: scale(1); z-index: auto;}
+
+.container-body .message-section .message-element .reaction-element img.emoji {
+    width: 20px; height: 20px;
+}
+
+.container-body .message-section .message-element.message-sent {
+    --message-bg: var(--message-sent);
+    align-self: flex-end;
+}
 .container-body .message-section .message-element.message-sent.message-new {border-top-right-radius: 0;}
 .container-body .message-section .message-element.message-sent.message-new::before {
     content: "";
@@ -143,7 +191,10 @@ input, input::placeholder, button {color: white; font-family: "Open Sans";}
     clip-path: polygon(0 0, 100% 0, 0 100%);
 }
 
-.container-body .message-section .message-element.message-received {align-self: flex-start;}
+.container-body .message-section .message-element.message-received {
+    --message-bg: var(--message-received);
+    align-self: flex-start;
+}
 .container-body .message-section .message-element.message-received.message-new {border-top-left-radius: 0;}
 .container-body .message-section .message-element.message-received.message-new::before {
     content: "";
@@ -156,13 +207,20 @@ input, input::placeholder, button {color: white; font-family: "Open Sans";}
 
 .container-body .message-section .message-element.message-new {
     display: grid; gap: 5px;
-    grid-template-columns: 30px 1fr;
-    grid-template-rows: 20px 1fr;
+    grid-template-columns: 25px 1fr;
+    grid-template-rows: 25px 1fr;
     grid-template-areas:
-        "name name"
-        "photo text";
-    padding-bottom: 15px;
+    "photo name"
+    "text text";
     margin-top: 10px;
+}
+.container-body .message-section .message-element.message-new.image {
+    grid-template-rows: 25px 1fr auto;
+    grid-template-areas:
+    "photo name"
+    "image image"
+    "text text";
+    padding-bottom: 10px;
 }
 
 .container-body .message-section .message-element.message-new .message-photo {
@@ -171,6 +229,19 @@ input, input::placeholder, button {color: white; font-family: "Open Sans";}
     position: absolute;
     grid-area: photo;
     object-fit: cover;
+}
+
+.container-body .message-section .message-element.message-new .message-username {
+    font-size: 0.8rem; color: var(--color-light);
+    grid-area: name; align-self: center;
+    cursor: pointer;
+}
+
+.container-body .message-section .message-element.message-new .user-status {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    border: 2px solid var(--message-bg);
+    z-index: 1; place-self: end;
 }
 
 .container-body .message-section .date-element {
@@ -190,18 +261,71 @@ input, input::placeholder, button {color: white; font-family: "Open Sans";}
     transform: scale(0); opacity: 0;
 }
 
+.container-body .message-context-menu {
+    position: fixed;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 5px;
+    filter: drop-shadow(0 5px 10px var(--color-dark));
+    transition: 0s;
+    z-index: -1000;
+}
+.container-body .message-context-menu.active {z-index: 1000;}
+
+.container-body .message-context-menu .add-reaction {
+    display: grid; gap: 5px;
+    grid-template-columns: repeat(6, 1fr);
+    background-color: var(--color-dark);
+    border-radius: 50px; padding: 5px;
+}
+
+.container-body .message-context-menu .add-reaction span {
+    width: 45px; height: 45px;
+    cursor: pointer;
+    transform: scale(0);
+}
+.container-body .message-context-menu .add-reaction .reaction-1 {transition-delay: 0s;}
+.container-body .message-context-menu .add-reaction .reaction-2 {transition-delay: 0.1s;}
+.container-body .message-context-menu .add-reaction .reaction-3 {transition-delay: 0.2s;}
+.container-body .message-context-menu .add-reaction .reaction-4 {transition-delay: 0.3s;}
+.container-body .message-context-menu .add-reaction .reaction-5 {transition-delay: 0.4s;}
+.container-body .message-context-menu .add-reaction .reaction-6 {transition-delay: 0.5s;}
+.container-body .message-context-menu.active .add-reaction span {transform: scale(1);}
+
+.container-body .message-context-menu .add-reaction span img {
+    width: 100%; height :100%;
+}
+
+.container-body .message-context-menu .message-options {
+    width: 200px;
+    display: flex; flex-direction: column;
+    background-color: var(--color-dark);
+    padding: 10px 0;
+    transform: scale(0);
+}
+.container-body .message-context-menu.active .message-options {
+    transform: scale(1);
+}
+
+.container-body .message-context-menu .message-options span {
+    height: 45px; padding: 0 15px;
+    display: flex; align-items: center;
+    cursor: pointer;
+}
+.container-body .message-context-menu .message-options span:hover {background-color: #0003;}
+
 .container-footer {
     background-color: var(--color-dark);
     display: grid; align-items: center;
     grid-template-columns: 50px 50px 1fr 50px;
     box-sizing: border-box; padding: 5px;
     position: relative;
+    color: var(--color-light);
 }
 
 .container-footer > span {display: grid; place-items: center;}
 .container-footer > * i {cursor: pointer; transform: scale(1.2);}
 
-.emoji-picker, .show-file-options, .send-message {height: 100%;border-radius: 50%;}
+.emoji-picker, .send-message {height: 100%;border-radius: 50%;}
 
 .container-footer .photo-preview {
     display: none;
@@ -226,42 +350,20 @@ input, input::placeholder, button {color: white; font-family: "Open Sans";}
     cursor: pointer;
 }
 
-.container-footer .photo-preview .preview-settings img {
+.container-footer .photo-preview img {
     width: 100px; height: 100px;
     object-fit: cover;
     border-radius: 5px;
 }
 
-.container-footer .file-attach {position: relative;}
-.container-footer .file-attach .show-file-options {
-    width: 50px; height: 50px;
-    background-color: inherit;
-    border: none;
-}
-.container-footer .file-attach .show-file-options.active {background-color: #0003;}
-.container-footer .file-attach .show-file-options.active + .file-options span label {
-    transform: translateY(0) scale(1);
-    opacity: 1;
-}
-
-.container-footer .file-attach .file-options {
-    position: absolute; bottom: calc(100% + 15px);
-    display: flex; flex-direction: column; gap: 10px;
-}
-
-.container-footer .file-attach .file-options span input {display: none;}
-.container-footer .file-attach .file-options span label {
-    display: grid; place-items: center;
-    width: 50px; height: 50px;
-    border-radius: 50%; cursor: pointer;
-    background-color: var(--color-dark);
-    transform: translateY(10px) scale(0);
-    opacity: 0;
-}
+.container-footer .photo-upload input {display: none;}
 
 .container-footer input#message-input {
     height: 40px; padding: 0 10px;
     border: none; border-radius: 5px;
-    background-color: var(--color-light);
+    background-color: var(--message-input);
     font-size: 18px; margin-left: 10px;
+}
+.container-footer input#message-input::placeholder {
+    color: var(--color-light);
 }

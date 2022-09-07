@@ -60,6 +60,32 @@
             <div class="scroll">
                 <i class="fa-solid fa-angle-down"></i>
             </div>
+            <div class="message-context-menu">
+                <div class="add-reaction">
+                    <span class="reaction">
+                        <div class="emoji" data-emoji="emoji-heart"></div>
+                    </span>
+                    <span class="reaction">
+                        <div class="emoji" data-emoji="emoji-smile"></div>
+                    </span>
+                    <span class="reaction">
+                        <div class="emoji" data-emoji="emoji-cry"></div>
+                    </span>
+                    <span class="reaction">
+                        <div class="emoji" data-emoji="emoji-surprise"></div>
+                    </span>
+                    <span class="reaction">
+                        <div class="emoji" data-emoji="emoji-angry"></div>
+                    </span>
+                    <span class="reaction">
+                        <div class="emoji" data-emoji="emoji-thumbs-up"></div>
+                    </span>
+                </div>
+                <div class="message-options">
+                    <span class="message-delete">Mesajı sil</span>
+                    <span class="message-reply">Mesajı yanıtla</span>
+                </div>
+            </div>
         </div>
         <div class="container-footer">
             <span class="photo-preview">
@@ -77,24 +103,11 @@
             <span class="emoji-picker">
                 <i class="fa-solid fa-face-smile"></i>
             </span>
-            <span class="file-attach">
-                <button class="show-file-options">
-                    <i class="fa-solid fa-paperclip"></i>
-                </button>
-                <span class="file-options">
-                    <span class="photo-upload">
-                        <input type="file" id="photoUpload" accept="image/*">
-                        <label for="photoUpload">
-                            <i class="fa-solid fa-image"></i>
-                        </label>
-                    </span>
-                    <span class="file-upload" style="display: none;">
-                        <input type="file" id="fileUpload">
-                        <label for="fileUpload">
-                            <i class="fa-solid fa-file"></i>
-                        </label>
-                    </span>
-                </span>
+            <span class="photo-upload">
+                <input type="file" id="photoUpload" accept="image/*">
+                <label for="photoUpload">
+                    <i class="fa-solid fa-image"></i>
+                </label>
             </span>
             <input type="text" placeholder="Mesaj gönderin" autocomplete="off" id="message-input">
             <span class="send-message">
@@ -104,5 +117,6 @@
     </div>
 
     <script src="script.js" type="module"></script>
+    <script src="emoji.js"></script>
 </body>
 </html

@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-app.js";
-import { getDatabase, ref, set, child, update, remove, get, onValue, onChildAdded, onChildChanged, onChildRemoved } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-database.js";
+import { getDatabase, ref, set, child, remove, get, onValue, onChildAdded, onChildChanged, onChildRemoved } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-database.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -21,20 +21,40 @@ const loginInput = document.querySelector("input#login-name-input");
 const loginSubmit = document.querySelector("div.login-submit");
 
 const messageContainer = document.querySelector("div.message-app-container");
+const messageSection = document.querySelector("div.message-section");
 const appTitle = document.querySelector(".title");
 
-var username;
-var online;
+let username;
+let online;
+const status = {
+    "online": {
+        "tr-TR": "Çevrimiçi",
+        "color": "#71eb8d"
+    },
+    "offline": {
+        "tr-TR": "Çevrimdışı",
+        "color": "#616066"
+    }
+};
 
-function randomColor(){
-    var color = Math.floor(Math.random()*16777215).toString(16);
-    do {color = "0" + color} while (color.length != 6);
-    return color;
-}
+function scroll(el) {el.scrollTop = el.scrollHeight;}
 
 function login(){
     username = loginInput.value;
     if (username) {
+        get(child(dbRef, `users/${username}`)).then((snapshot) => {
+            if (!snapshot.exists()) {
+                const userData = {
+                    "createTime": Date.now(),
+                    "profilePhoto": "./imgs/default-avatar.png",
+                    "status": "online"
+                }
+                set(ref(database, `users/${username}`), userData);
+            }
+        }).catch((error) => {
+            console.log(error);
+        })
+
         get(child(dbRef, "messages")).then((snapshot) => {
             if (snapshot.exists()){
                 const messages = snapshot.val();
@@ -47,40 +67,82 @@ function login(){
                 })
             }
         })
-        get(child(dbRef, `users/${username}`)).then((snapshot) => {
-            if (!snapshot.exists()) {
-                set(ref(database, `users/${username}`), {
-                    createTime: Date.now(),
-                    color: randomColor(),
-                    profilePhoto: "./imgs/default-avatar.png"
-                });
+
+        get(child(dbRef, "users")).then((snapshot) => {
+            if (snapshot.exists()){
+                Object.keys(snapshot.val()).forEach(user => {
+                    onChildChanged(ref(database, `users/${user}/`), (child) => {
+                        if (child.key === "status") {
+                            [...document.querySelectorAll(`.message-element[data-user='${user}'] .user-status`)].forEach(el => {
+                                el.style["background-color"] = status[child.val()]["color"];
+                            });
+                        }
+                        if (child.key === "color") {
+                            [...document.querySelectorAll(`.message-element[data-user='${user}'] .message-username`)].forEach(el => {
+                                el.style["color"] = child.val();
+                            });
+                        }
+                        if (child.key === "profilePhoto") {
+                            [...document.querySelectorAll(`.message-element[data-user='${user}'] .messag-photo`)].forEach(el => {
+                                el.src = child.val();
+                            });
+                        }
+                    });
+                })
             }
-        }).catch((error) => {
-            console.log(error);
         })
+        
+        set(ref(database, `users/${username}/status`), "online");
+
         loginContainer.style.display = "none";
         messageContainer.style.display = "grid";
+        scroll(messageSection);
         appTitle.innerHTML = username;
         online = true;
     }
 }
 
 loginSubmit.addEventListener("click", function(e){login();})
-loginInput.addEventListener("keydown", function(e){
-    if (e.keyCode === 13) {login()};
-})
+loginInput.addEventListener("keydown", function(e){if (e.keyCode === 13) {login()};})
 
-const messageSection = document.querySelector("div.message-section");
 const messageInput = document.querySelector("input#message-input");
 const messageSend = document.querySelector("span.send-message");
+const messageContextMenu = document.querySelector("div.message-context-menu");
+const messageReactions = document.querySelectorAll("span.reaction");
+const messageDelete = document.querySelector("span.message-delete");
 const photoPreview = document.querySelector("span.photo-preview");
-const showFileOptions = document.querySelector("button.show-file-options");
-const appOptions = document.querySelector("button.dots");
+const showAppOptions = document.querySelector("button.dots");
+const appOptions = document.querySelector("span.options");
 const photoInput = document.querySelector("input#photoUpload");
-const fileInput = document.querySelector("input#fileUpload");
+const photoDelete = document.querySelector("span.delete-photo");
 const scrollToBottom = document.querySelector("div.scroll");
 const userColorInput = document.querySelector("input#user-color-picker");
 const profilePhotoInput = document.querySelector("input#user-photo-picker");
+
+function normalizePosition(mouseX, mouseY) {
+    const {
+        left: sectionOffsetX,
+        top: sectionOffsetY
+    } = messageSection.getBoundingClientRect();
+
+    const sectionX = mouseX - sectionOffsetX;
+    const sectionY = mouseY - sectionOffsetY;
+
+    const outOfBoundsOnX = sectionX + messageContextMenu.clientWidth > messageSection.clientWidth;
+    const outOfBoundsOnY = sectionY + messageContextMenu.clientHeight > messageSection.clientHeight;
+
+    let normalizedX = mouseX;
+    let normalizedY = mouseY;
+
+    if (outOfBoundsOnX) {
+        normalizedX = sectionOffsetX + messageSection.clientWidth - messageContextMenu.clientWidth;
+    }
+    if (outOfBoundsOnY) {
+        normalizedY = sectionOffsetY + messageSection.clientHeight - messageContextMenu.clientHeight;
+    }
+
+    return {normalizedX, normalizedY};
+};
 
 function getTimeFromMS(milliseconds){
     const date = new Date(milliseconds);
@@ -115,11 +177,8 @@ function sendMessageToDB(){
     get(child(dbRef, "messages")).then((snapshot) => {
         var messageId;
         if (snapshot.exists()) {
-            const messagesObject = snapshot.val();
-            var messageIDs = Object.keys(messagesObject);
-            messageIDs = messageIDs.map(e => e.replace("message", ""));
-            const maxValue = Math.max(...messageIDs);
-            messageId = "message" + (maxValue+1);
+            const maxValue = Math.max(...Object.keys(snapshot.val()).map(e => e.replace("message", "")));
+            messageId = `message${maxValue+1}`;
             const previousMessageId = `message${maxValue}`;
             
             if (messageInfo["sender"] !== snapshot.val()[previousMessageId]["sender"]) {
@@ -142,18 +201,8 @@ function sendMessageToDB(){
     })
 }
 
-onValue(ref(database, `messages/`), (snapshot) => {
-    if (snapshot.exists()){
-        const messagesObject = snapshot.val();
-        var messageIDs = Object.keys(messagesObject);
-        messageIDs = messageIDs.map(e => e.replace("message", ""));
-        const maxValue = Math.max(...messageIDs);
-        get(child(dbRef, `messages/message${maxValue}`)).then((message) => {
-            if (message.exists() && online){
-                sendMessage(`message${maxValue}`, message.val());
-            }
-        })
-    }
+onChildAdded(ref(database, `messages/`), (snapshot) => {
+    if (online) {sendMessage(snapshot.key, snapshot.val());}
 });
 
 function sendMessage(messageId, messageData){
@@ -162,6 +211,8 @@ function sendMessage(messageId, messageData){
     const text = messageData["content"];
     const messageElement = document.createElement("span");
     messageElement.classList.add("message-element");
+    messageElement.id = messageId;
+    messageElement.setAttribute("data-user", messageData["sender"]);
 
     if (messageData["newMessageFromUser"]) {
         messageElement.classList.add("message-new");
@@ -173,14 +224,19 @@ function sendMessage(messageId, messageData){
         const userPhoto = document.createElement("img");
         userPhoto.classList.add("message-photo");
 
+        const userStatus = document.createElement("span");
+        userStatus.classList.add("user-status");
+
         get(child(dbRef, `users/${messageData["sender"]}`)).then((snapshot) => {
             if (snapshot.exists()) {
                 messageName.style.color = snapshot.val()["color"];
                 userPhoto.src = snapshot.val()["profilePhoto"];
+                userStatus.style["background-color"] = status[snapshot.val()["status"]]["color"];
             }
         })
 
         messageElement.appendChild(userPhoto);
+        messageElement.appendChild(userStatus);
         messageElement.appendChild(messageName);
     }
 
@@ -192,9 +248,10 @@ function sendMessage(messageId, messageData){
     if (image) {
         const imageContent = document.createElement("img");
         imageContent.classList.add("image-content");
-        imageContent.setAttribute("src", image.src);
+        imageContent.setAttribute("src", image);
         messageElement.appendChild(imageContent);
-        image.src=""; photoPreview.style.display = "none";
+        messageElement.classList.add("image");
+        photoPreview.style.display = "none";
     } if (text) {
         const messageContent = document.createElement("span");
         messageContent.classList.add("message-content");
@@ -202,16 +259,144 @@ function sendMessage(messageId, messageData){
         messageElement.appendChild(messageContent);
         messageInput.value = "";
     }
-    messageSection.appendChild(messageElement);
-    messageSection.scrollTop = messageContainer.scrollHeight;
 
+    if (messageData["deleted"]) {
+        messageElement.innerHTML = "Bu mesaj silindi.";
+        messageElement.classList.add("deleted");
+    }
+    
+    const reactionElement = document.createElement("span");
+    reactionElement.classList.add("reaction-element");
+    messageElement.appendChild(reactionElement);
+
+    if (messageData["reactions"] && !messageData["deleted"]) {
+        Object.keys(messageData["reactions"]).forEach(user => {
+            addReaction(messageElement, messageData["reactions"][user], user);
+        })
+    }
+
+    messageSection.appendChild(messageElement);
+    scroll(messageSection);
+    // if (online && !(messageData["sender"] === username)) {alert("Yeni mesaj!");}
+    
     if (messageData["newDate"]) {
         const dateElement = document.createElement("span");
         dateElement.classList.add("date-element");
-        dateElement.innerHTML = getDateFromMS(messageData["createTime"]);
+
+        const dateCreateTime = new Date(messageData["createTime"]);
+        const currentTime = new Date();
+        const difference = Math.floor((currentTime - dateCreateTime) / (1000 * 3600 * 24));
+
+        if (getDateFromMS(messageData["createTime"]) === getDateFromMS(Date.now())) {
+            dateElement.innerHTML = "Bugün";
+        } else if (difference <= 3) {
+            dateElement.innerHTML = new Intl.DateTimeFormat('tr-TR', {weekday: "long"}).format(dateCreateTime);
+        } else {
+            dateElement.innerHTML = getDateFromMS(messageData["createTime"]);
+        }
+
         messageSection.insertBefore(dateElement, messageElement);
     }
+
+    if (!messageData["deleted"]) {
+        messageElement.addEventListener("contextmenu", function(e){
+            e.preventDefault();
+    
+            const {clientX: mouseX, clientY: mouseY} = e;
+    
+            const {normalizedX, normalizedY} = normalizePosition(mouseX, mouseY);
+            
+            messageContextMenu.style.top = `${normalizedY}px`;
+            messageContextMenu.style.left = `${normalizedX}px`;
+    
+            if (messageData["sender"] !== username && username !== "kagan") {messageDelete.style.display = "none";}
+            else {messageDelete.style.display = "flex"};
+    
+            messageContextMenu.setAttribute("data-message", messageId);
+    
+            messageContextMenu.classList.toggle("active");
+        })
+
+        messageElement.addEventListener("dblclick", function(e){
+            const doubleClickEmoji = "emoji-heart";
+            if (reactionElement.querySelector(`img.emoji[data-user='${username}'][data-emoji='${doubleClickEmoji}']`)) {
+                remove(ref(database, `messages/${messageId}/reactions/${username}`));
+            } else {
+                set(ref(database, `messages/${messageId}/reactions/${username}`), doubleClickEmoji);
+            }
+        })
+        
+        onChildAdded(ref(database, `messages/${messageId}/reactions/`), (child) => {
+            addReaction(
+                document.querySelector(`#${messageId}`), child.val(), child.key
+            );
+        })
+        onChildChanged(ref(database, `messages/${messageId}/reactions/`), (child) => {
+            addReaction(
+                document.querySelector(`#${messageId}`), child.val(), child.key
+            );
+        })
+        onChildRemoved(ref(database, `messages/${messageId}/reactions/`), (child) => {
+            removeReaction(
+                document.querySelector(`#${messageId}`), child.key
+            );
+        })
+
+        onChildAdded(ref(database, `messages/${messageId}/`), (child) => {
+            if (child.key === "deleted") {
+                messageElement.innerHTML = "Bu mesaj silindi.";
+                messageElement.classList.add("deleted");
+            }
+        })
+    }
+
 }
+
+[...messageReactions].forEach(reaction => {
+    reaction.addEventListener("click", function(e){
+        const messageId = messageContextMenu.getAttribute("data-message");
+        const emojiToReact = reaction.querySelector("img").className;
+        get(child(dbRef, `messages/${messageId}/reactions/${username}`)).then(snapshot => {
+            if (snapshot.exists() && (snapshot.val() === emojiToReact)) {
+                remove(ref(database, `messages/${messageId}/reactions/${username}`));
+            }
+            else {
+                set(ref(database, `messages/${messageId}/reactions/${username}`), emojiToReact);
+            }
+        });
+        messageContextMenu.classList.remove("active");
+    })
+})
+
+function addReaction(messageElement, emoji, user) {
+    const reactionElement = messageElement.querySelector("span.reaction-element");
+    let emojiElement = reactionElement.querySelector(`img.emoji[data-user='${user}']`);
+    
+    if (!emojiElement) {
+        emojiElement = document.createElement("img");
+        emojiElement.classList.add("emoji");
+        emojiElement.setAttribute("data-user", user);
+        emojiElement.draggable = false;
+    } 
+    emojiElement.src = `./imgs/emojis/${emoji}.png`;
+    emojiElement.alt = emojis[emoji];
+    emojiElement.setAttribute("data-emoji", emoji);
+    
+    reactionElement.classList.add("active");
+    messageElement.classList.add("reacted");
+    reactionElement.appendChild(emojiElement);
+}
+
+function removeReaction(messageElement, user) {
+    const reactionElement = messageElement.querySelector("span.reaction-element")
+    const emojiElement = reactionElement.querySelector(`img.emoji[data-user='${user}']`);
+    reactionElement.removeChild(emojiElement);
+    if (!reactionElement.firstChild) {reactionElement.classList.remove("active"); messageElement.classList.remove("reacted")};
+}
+
+document.addEventListener("load", (e) => {
+    scroll(messageSection);
+});
 
 messageSend.addEventListener("click", function(e){
     sendMessageToDB();
@@ -221,18 +406,14 @@ messageInput.addEventListener("keydown", function(e){
     if (e.keyCode === 13) {sendMessageToDB();}
 });
 
-showFileOptions.addEventListener("click", function(e){
-    showFileOptions.classList.toggle("active");
-});
-
-[fileInput, photoInput].forEach(element => {
-    element.addEventListener("input", function(e){
-        showFileOptions.classList.remove("active");
-    })
+messageDelete.addEventListener("click", function(e){
+    const messageId = messageContextMenu.getAttribute("data-message");
+    set(ref(database, `messages/${messageId}/deleted`), true);
 })
 
-appOptions.addEventListener("click", function(e){
-    appOptions.classList.toggle("active");
+
+showAppOptions.addEventListener("click", function(e){
+    showAppOptions.classList.toggle("active");
     document.querySelector(".option-color .user-color-picker").classList.remove("active");
 });
 
@@ -241,7 +422,7 @@ userColorInput.addEventListener("change", function(e){
         if (snapshot.exists()) {
             set(ref(database, `users/${username}/color`), e.target.value);
             alert("Renk başarıyla değiştirildi!");
-            appOptions.classList.remove("active");
+            showAppOptions.classList.remove("active");
         }
     }).catch((error) => {
         alert("Bir hata oluştu!");
@@ -262,7 +443,7 @@ document.querySelector(".option-color").addEventListener("click", function(e){
             if (snapshot.exists()) {
                 set(ref(database, `users/${username}/color`), color);
                 alert("Renk başarıyla değiştirildi!");
-                appOptions.classList.remove("active");
+                showAppOptions.classList.remove("active");
             }
         }).catch((error) => {
             alert("Bir hata oluştu!");
@@ -275,7 +456,6 @@ document.querySelector(".option-color").addEventListener("click", function(e){
 profilePhotoInput.addEventListener("change", function(e){
     get(child(dbRef, `users/${username}`)).then((snapshot) => {
         if (snapshot.exists()) {
-            console.log(e.target.files);
             const profilePhoto = e.target.files[0];
             const reader = new FileReader();
 
@@ -285,13 +465,33 @@ profilePhotoInput.addEventListener("change", function(e){
 
             reader.readAsDataURL(profilePhoto);
             alert("Profil fotoğrafı başarıyla eklendi!");
-            appOptions.classList.remove("active");
+            showAppOptions.classList.remove("active");
         }
     }).catch((error) => {
             alert("Bir hata oluştu!");
             console.log(error);
         }
     )
+})
+
+photoInput.addEventListener("change", function(e){
+    const photoToUpload = e.target.files[0];
+    const reader = new FileReader();
+
+    const previewElement = photoPreview.querySelector("img") ?? document.createElement("img");
+    reader.addEventListener("load", ()=>{
+        previewElement.src = reader.result;
+    })
+    reader.readAsDataURL(photoToUpload);
+    
+    photoPreview.appendChild(previewElement);
+    photoPreview.style.display = "block";
+    photoInput.value = "";
+})
+
+photoDelete.addEventListener("click", function(e){
+    photoPreview.style.display = "none";
+    photoInput.value = "";
 })
 
 messageSection.addEventListener("scroll", function(e){
@@ -305,5 +505,24 @@ messageSection.addEventListener("scroll", function(e){
 })
 
 scrollToBottom.addEventListener("click", function(e){
-    messageSection.scrollTop = messageSection.scrollHeight;
+    scroll(messageSection);
 })
+
+document.body.addEventListener("click", function(e){
+    if (e.target !== messageContextMenu && !messageContextMenu.contains(e.target)) {
+        messageContextMenu.classList.remove("active");
+    }
+    if (e.target !== showAppOptions && e.target !== appOptions && !appOptions.contains(e.target)) {
+        showAppOptions.classList.remove("active");
+    }
+})
+
+document.addEventListener('visibilitychange', function() {
+    if (username) {
+        if (document.visibilityState == 'hidden') { 
+            set(ref(database, `users/${username}/status`), "offline");
+        } else if (document.visibilityState == 'visible') {
+            set(ref(database, `users/${username}/status`), "online");
+        }
+    }
+});
