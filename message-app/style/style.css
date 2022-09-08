@@ -373,9 +373,12 @@ input, button {color: white; font-family: "Open Sans";}
 @media screen and (max-width: 700px) {
     .container-footer {
         grid-template-areas: "emoji photo input input";
+        padding-right: 10px;
     }
     .container-footer input#message-input {
         grid-area: input;
+        margin-left: 0;
+        padding-right: 45px;
     }
     .container-footer .send-message {
         grid-area: input;
