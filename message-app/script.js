@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-app.js";
 import { getDatabase, ref, set, child, remove, get, onChildAdded, onChildChanged, onChildRemoved } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-database.js";
-import { firebaseConfig } from "./fireabase-config.js";
+import { firebaseConfig } from "./firebase-config.js";
 
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
@@ -52,7 +52,6 @@ function login(){
             }
         })
 
-        // TODO: Add onChildAdded for users object so it doesn't have to call every user when a new user logs in
         get(child(dbRef, "users")).then((snapshot) => {
             if (snapshot.exists()){
                 Object.keys(snapshot.val()).forEach(user => {
@@ -68,7 +67,7 @@ function login(){
                             });
                         }
                         if (child.key === "profilePhoto") {
-                            [...document.querySelectorAll(`.message-element[data-user='${user}'] .messag-photo`)].forEach(el => {
+                            [...document.querySelectorAll(`.message-element[data-user='${user}'] .message-photo`)].forEach(el => {
                                 el.src = child.val();
                             });
                         }
@@ -237,6 +236,8 @@ function sendMessage(messageId, messageData){
         messageElement.appendChild(imageContent);
         messageElement.classList.add("image");
         photoPreview.style.display = "none";
+        const previewElement = photoPreview.querySelector("img")
+        if (previewElement) {photoPreview.removeChild(previewElement);}
     } if (text) {
         const messageContent = document.createElement("span");
         messageContent.classList.add("message-content");
@@ -262,7 +263,6 @@ function sendMessage(messageId, messageData){
 
     messageSection.appendChild(messageElement);
     scroll(messageSection);
-    // if (online && !(messageData["sender"] === username)) {alert("Yeni mesaj!");}
     
     if (messageData["newDate"]) {
         const dateElement = document.createElement("span");
@@ -397,7 +397,6 @@ messageDelete.addEventListener("click", function(e){
     messageContextMenu.classList.remove("active");
 })
 
-
 showAppOptions.addEventListener("click", function(e){
     showAppOptions.classList.toggle("active");
     document.querySelector(".option-color .user-color-picker").classList.remove("active");
@@ -470,13 +469,15 @@ photoInput.addEventListener("change", function(e){
     })
     reader.readAsDataURL(photoToUpload);
     
-    photoPreview.appendChild(previewElement);
+    if (!photoPreview.contains(previewElement)) {photoPreview.appendChild(previewElement);}
     photoPreview.style.display = "block";
     photoInput.value = "";
 })
 
 photoDelete.addEventListener("click", function(e){
     photoPreview.style.display = "none";
+    const previewElement = photoPreview.querySelector("img");
+    photoPreview.removeChild(previewElement);
     photoInput.value = "";
 })
 
