@@ -13,9 +13,9 @@ A real-time message app using Firebase Realtime Database
     * Language: Turkish
 * ### To do:
     * Reply messages
-    * Bot commands
+    * Bot commands -
     * Language settings (English/Turkish)
     * Adding more emojis or an emoji pack
-    * Changing message id system
+    * Changing message id system -
 
 ## [Go on and leave a message!](https://kaganozer.github.io/message-app/)

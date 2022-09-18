@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-app.js";
-import { getDatabase, ref, set, child, remove, get, onChildAdded, onChildChanged, onChildRemoved } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-database.js";
+import { getDatabase, ref, set, push, child, remove, get, onChildAdded, onChildChanged, onChildRemoved } from "https://www.gstatic.com/firebasejs/9.9.3/firebase-database.js";
 import { firebaseConfig } from "./firebase-config.js";
 
 const app = initializeApp(firebaseConfig);
@@ -12,14 +12,19 @@ const loginSubmit = document.querySelector("div.login-submit");
 
 const messageContainer = document.querySelector("div.message-app-container");
 const messageSection = document.querySelector("div.message-section");
+const messageInput = document.querySelector("input#message-input");
+const messageTyping = document.querySelector("span.message-typing");
+const typingUsers = document.querySelector("span.typing-users");
 const appTitle = document.querySelector(".title");
 
 let username;
 let online;
 const status = {
     "online": "#71eb8d",
-    "offline": "#616066"
+    "offline": "#616066",
+    "dnd": "#b84435"
 };
+const prefix = "$";
 
 function scroll(el) {el.scrollTop = el.scrollHeight;}
 
@@ -27,6 +32,14 @@ function login(){
     username = loginInput.value;
     if (username) {
         get(child(dbRef, `users/${username}`)).then((snapshot) => {
+            if (snapshot.val()?.permissions?.admin) {
+                const password = prompt("Password for admin account");
+                if (password !== snapshot.val()["password"]) {
+                    alert("Wrong password!");
+                    return;
+                }
+            }
+
             if (!snapshot.exists()) {
                 const userData = {
                     "createTime": Date.now(),
@@ -35,21 +48,26 @@ function login(){
                 }
                 set(ref(database, `users/${username}`), userData);
             }
-        }).catch((error) => {
-            console.log(error);
-        })
 
-        get(child(dbRef, "messages")).then((snapshot) => {
-            if (snapshot.exists()){
-                const messages = snapshot.val();
-                const messagesArr = Object.keys(messages);
-                messagesArr.sort(function (a, b) {
-                    return (+a.replace("message", "")) - (+b.replace("message", ""));
-                });
-                messagesArr.forEach(message => {
-                    sendMessage(message, messages[message]);
-                })
-            }
+            get(child(dbRef, "messages")).then((snapshot) => {
+                if (snapshot.exists()){
+                    const messages = snapshot.val();
+                    const messagesArr = Object.keys(messages);
+                    messagesArr.sort(function (a, b) {
+                        return (+a.replace("message", "")) - (+b.replace("message", ""));
+                    });
+                    messagesArr.forEach(message => {
+                        sendMessage(message, messages[message]);
+                    })
+                }
+            })
+
+            loginContainer.style.display = "none";
+            messageContainer.style.display = "grid";
+            scroll(messageSection);
+            messageInput.focus();
+            appTitle.innerHTML = username;
+            online = true;
         })
 
         get(child(dbRef, "users")).then((snapshot) => {
@@ -72,24 +90,37 @@ function login(){
                             });
                         }
                     });
+
+                    onChildAdded(ref(database, `users/${user}`), (child) => {
+                        if (child.key === "typing") {
+                            const userElement = document.createElement("span");
+                            if (typingUsers.firstChild) {userElement.innerHTML = ", ";}
+                            else {messageTyping.classList.add("active");}
+                            userElement.innerHTML += user;
+                            userElement.setAttribute("data-user", user);
+                            typingUsers.appendChild(userElement);
+                        }
+                    })
+
+                    onChildRemoved(ref(database, `users/${user}`), (child) => {
+                        if (child.key === "typing") {
+                            const userElement = typingUsers.querySelector(`span[data-user='${user}']`);
+                            typingUsers.removeChild(userElement);
+                            if (!typingUsers.firstChild) {messageTyping.classList.remove("active");}
+                            else {typingUsers.firstChild.innerHTML = typingUsers.firstChild.innerHTML.replace(", ", "");}
+                        }
+                    })
                 })
             }
         })
         
-        set(ref(database, `users/${username}/status`), "online");
-
-        loginContainer.style.display = "none";
-        messageContainer.style.display = "grid";
-        scroll(messageSection);
-        appTitle.innerHTML = username;
-        online = true;
+        set(ref(database, `users/${username}/status`), username === "system" ? "dnd" : "online");
     }
 }
 
 loginSubmit.addEventListener("click", function(e){login();})
 loginInput.addEventListener("keydown", function(e){if (e.keyCode === 13) {login()};})
 
-const messageInput = document.querySelector("input#message-input");
 const messageSend = document.querySelector("span.send-message");
 const messageContextMenu = document.querySelector("div.message-context-menu");
 const messageReactions = document.querySelectorAll("span.reaction");
@@ -143,27 +174,26 @@ function getDateFromMS(milliseconds){
     return `${day} ${month} ${year}`;
 }
 
-function sendMessageToDB(){
-    const image = document.querySelector("span.photo-preview img");
-    const text = messageInput.value;
-    if (!image && !text) {return;}
+function sendMessageToDB(user, text, image=null, deleteAfter=false){
+    if (!online) {return;}
+    if (!text && !image) {return;}
     
     const createTime = new Date();
 
     const messageInfo = {
-        "sender": username,
+        "sender": user,
         "createTime": createTime.getTime()
     };
 
-    if (image) {messageInfo["imageURL"] = image.src};
+    if (image) {messageInfo["imageURL"] = image};
     if (text) {messageInfo["content"] = text};
+    if (deleteAfter) {messageInfo["deleteAfter"] = true};
+    if (text.startsWith(prefix)) {messageInfo["command"] = true;}
 
     get(child(dbRef, "messages")).then((snapshot) => {
-        var messageId;
         if (snapshot.exists()) {
-            const maxValue = Math.max(...Object.keys(snapshot.val()).map(e => e.replace("message", "")));
-            messageId = `message${maxValue+1}`;
-            const previousMessageId = `message${maxValue}`;
+            const messagesArr = Object.keys(snapshot.val());
+            const previousMessageId = messagesArr[messagesArr.length-1];
             
             if (messageInfo["sender"] !== snapshot.val()[previousMessageId]["sender"]) {
                 messageInfo["newMessageFromUser"] = true;
@@ -177,16 +207,19 @@ function sendMessageToDB(){
             }
 
         } else {
-            messageId = "message1";
             messageInfo["newDate"] = true;
             messageInfo["newMessageFromUser"] = true;
         }
-        set(ref(database, `messages/${messageId}`), messageInfo);
+
+        const messageRef = push(ref(database, "messages"));
+        set(messageRef, messageInfo);
     })
 }
 
 onChildAdded(ref(database, `messages/`), (snapshot) => {
-    if (online) {sendMessage(snapshot.key, snapshot.val());}
+    if (online) {
+        sendMessage(snapshot.key, snapshot.val());
+    }
 });
 
 function sendMessage(messageId, messageData){
@@ -223,12 +256,18 @@ function sendMessage(messageId, messageData){
         messageElement.appendChild(userStatus);
         messageElement.appendChild(messageName);
     }
-
+    
     if (messageData["sender"] === username) {messageElement.classList.add("message-sent");}
     else {messageElement.classList.add("message-received");}
 
+    if (messageData["deleteAfter"]) {
+        setTimeout(function(){
+            remove(ref(database, `messages/${messageId}`));
+        }, 1500);
+    }
+    
     messageElement.setAttribute("data-time", getTimeFromMS(messageData["createTime"]));
-
+    
     if (image) {
         const imageContent = document.createElement("img");
         imageContent.classList.add("image-content");
@@ -241,11 +280,124 @@ function sendMessage(messageId, messageData){
     } if (text) {
         const messageContent = document.createElement("span");
         messageContent.classList.add("message-content");
-        messageContent.innerHTML = text;
+
+        // * Message formatting
+        // link: https://
+        // bold: *text*
+        // italic: _text_
+        // strike through: -text-
+        // underline: !text!
+        // embed: `text`
+        // https://stackoverflow.com/questions/15278728/regular-expression-formatting-text-in-a-block-im
+        const linkPattern  = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+        const boldPattern = /(?![^<]*<\/a>)(^|<.>|[\s\W_])\*(\S.*?\S)\*($|<\/.>|[\s\W_])/g;
+        const italicsPattern = /(?![^<]*<\/a>)(^|<.>|[\s\W])_(\S.*?\S)_($|<\/.>|[\s\W])/g;
+        const strikethroughPattern = /(?![^<]*<\/a>)(^|<.>|[\s\W_])-(\S.*?\S)-($|<\/.>|[\s\W_])/gi;
+        const underlinePattern = /(?![^<]*<\/a>)(^|<.>|[\s\W_])!(\S.*?\S)!($|<\/.>|[\s\W_])/gi;
+        const embedPattern = /(?![^<]*<\/a>)(^|<.>|[\s\W_])`(\S.*?\S)`($|<\/.>|[\s\W_])/gi;
+        messageContent.innerHTML =
+            text.replace(linkPattern, "<a href=\"$1\">$1</a>")
+                .replace(strikethroughPattern, "$1<s>$2</s>$3")
+                .replace(italicsPattern, "$1<i>$2</i>$3")
+                .replace(boldPattern, "$1<b>$2</b>$3")
+                .replace(underlinePattern, "$1<u>$2</u>$3")
+                .replace(embedPattern, "$1<code>$2</code>$3");
+
+        // * Bot commands
+        if (messageData["command"]) {
+            remove(ref(database, `messages/${messageId}/command`));
+            const errors = {
+                user: "Belirtilen kullanıcı bulunamadı.",
+                command: "Belirtilen komut bulunamadı.",
+                permission: "Bu komutu kullanmak için gerekli yetkiye sahip değilsiniz."
+            }
+            const commands = {
+                // Fun commands
+                sa: {
+                    handler: function() {
+                        sendMessageToDB("system", "as");
+                    },
+                    info: "Bot `as` şeklinde cevap verir."
+                },
+                // User commands
+                id: {
+                    handler: function(user=username) {
+                        get(child(dbRef, `users/${user}`)).then((snapshot) => {
+                            if (snapshot.exists()) {sendMessageToDB("system", `*${user}* adlı kullanıcının ID'si: ${snapshot.val()["createTime"]}`);}
+                            else {sendMessageToDB("system", errors["user"]);}
+                        })
+                    },
+                    info: "Girilen kullanıcının ID'sini gösterir."
+                },
+                avatar: {
+                    handler: function(user=username) {
+                        get(child(dbRef, `users/${user}`)).then((snapshot) => {
+                            if (snapshot.exists()) {sendMessageToDB("system", `*${user}* adlı kullanıcının profil fotoğrafı`, snapshot.val()["profilePhoto"]);}
+                            else {sendMessageToDB("system", errors["user"]);}
+                        })
+                    },
+                    info: "Girilen kullanıcının profil fotoğrafını gösterir."
+                },
+                // Admin commands
+                delete: {
+                    permissions: ["admin"],
+                    handler: function(amount=1) {
+                        get(child(dbRef, "messages")).then((snapshot) => {
+                            const messagesArr = Object.keys(snapshot.val()).reverse();
+                            amount = (amount === "all") ? messagesArr.length : amount;
+                            const feedBack = (amount === "all") ? "Bütün mesajlar silindi." : `${amount} adet mesaj silindi.`;
+                            for (let i=0; i<(+amount)+1; i++) {
+                                remove(ref(database, `messages/${messagesArr[i]}`));
+                            }
+                            sendMessageToDB("system", feedBack, null, true);
+                        })
+                    },
+                    info: "Girilen miktarda mesajı siler."
+                },
+                help: {
+                    handler: function(command=null) {
+                        const getInfo = (c) => {
+                            if (!commands[c]["info"]) {return;}
+                            return `*$${c}:* ${commands[c]["info"]}` + (commands[c]["permissions"] ? `<br>Gerekli izinler: \`${commands[c]["permissions"]}\`<br>` : "<br>");
+                        }
+                        let feedBack = "";
+                        if (command) {
+                            feedBack += getInfo(command);
+                            if (!commands[command]) {sendMessageToDB("system", errors["command"]); return;}
+                        } else {
+                            feedBack += `Bot komut prefix'i: ${prefix}<br><br>`;
+                            Object.keys(commands).forEach(c => {
+                                feedBack += getInfo(c);
+                            });
+                        }
+                        sendMessageToDB("system", feedBack);
+                    },
+                    info: "Komut bilgilerini gösterir."
+                }
+            }
+            const textSplit = text.slice(1).split(" ");
+            const command = textSplit[0];
+            const params = textSplit.slice(1);
+            get(child(dbRef, `users/${messageData["sender"]}`)).then((snapshot) => {
+                if (commands[command]) {
+                    const userPermissions = snapshot.val()["permissions"];
+                    const commandPermissions = commands[command]["permissions"];
+                    if (!commandPermissions) {
+                        commands[command].handler(...params);
+                    } else if (commandPermissions && !userPermissions) {
+                        sendMessageToDB("system", errors["permission"]);
+                    } else if (commandPermissions.filter(perm => userPermissions[perm]).length) {
+                        commands[command].handler(...params);
+                    } else {
+                        sendMessageToDB("system",errors["permission"]);
+                    }
+                }
+            })
+        }
         messageElement.appendChild(messageContent);
         messageInput.value = "";
     }
-
+    
     if (messageData["deleted"]) {
         messageElement.innerHTML = "Bu mesaj silindi.";
         messageElement.classList.add("deleted");
@@ -254,24 +406,24 @@ function sendMessage(messageId, messageData){
     const reactionElement = document.createElement("span");
     reactionElement.classList.add("reaction-element");
     messageElement.appendChild(reactionElement);
-
+    
     if (messageData["reactions"] && !messageData["deleted"]) {
         Object.keys(messageData["reactions"]).forEach(user => {
             addReaction(messageElement, messageData["reactions"][user], user);
         })
     }
-
+    
     messageSection.appendChild(messageElement);
     scroll(messageSection);
     
     if (messageData["newDate"]) {
         const dateElement = document.createElement("span");
         dateElement.classList.add("date-element");
-
+        
         const dateCreateTime = new Date(messageData["createTime"]);
         const currentTime = new Date();
         const difference = Math.floor((currentTime - dateCreateTime) / (1000 * 3600 * 24));
-
+        
         if (getDateFromMS(messageData["createTime"]) === getDateFromMS(Date.now())) {
             dateElement.innerHTML = "Bugün";
         } else if (difference <= 3) {
@@ -279,29 +431,29 @@ function sendMessage(messageId, messageData){
         } else {
             dateElement.innerHTML = getDateFromMS(messageData["createTime"]);
         }
-
+        
         messageSection.insertBefore(dateElement, messageElement);
     }
-
+    
     if (!messageData["deleted"] || !messageElement.classList.contains("deleted")) {
         messageElement.addEventListener("contextmenu", function(e){
             e.preventDefault();
-    
+            
             const {clientX: mouseX, clientY: mouseY} = e;
-    
+            
             const {normalizedX, normalizedY} = normalizePosition(mouseX, mouseY);
             
             messageContextMenu.style.top = `${normalizedY}px`;
             messageContextMenu.style.left = `${normalizedX}px`;
-    
+            
             if (messageData["sender"] !== username && username !== "kagan") {messageDelete.style.display = "none";}
             else {messageDelete.style.display = "flex"};
-    
+            
             messageContextMenu.setAttribute("data-message", messageId);
-    
+            
             messageContextMenu.classList.toggle("active");
         })
-
+        
         messageElement.addEventListener("dblclick", function(e){
             const doubleClickEmoji = "emoji-heart";
             if (reactionElement.querySelector(`img.emoji[data-user='${username}'][data-emoji='${doubleClickEmoji}']`)) {
@@ -334,8 +486,19 @@ function sendMessage(messageId, messageData){
             }
         })
     }
-
 }
+
+onChildRemoved(ref(database, `messages/`), (snapshot) => {
+    if (online) {
+        const messageElement = document.querySelector(`#${snapshot.key}`);
+        const previousElement = messageElement.previousElementSibling;
+        const nextElement = messageElement.nextElementSibling;
+        if (previousElement.classList.contains("date-element") && (!nextElement || nextElement.classList.contains("date-element"))) {
+            messageSection.removeChild(previousElement);
+        };
+        messageSection.removeChild(messageElement);
+    }
+});
 
 [...messageReactions].forEach(reaction => {
     reaction.addEventListener("click", function(e){
@@ -384,12 +547,17 @@ document.addEventListener("load", (e) => {
 });
 
 messageSend.addEventListener("click", function(e){
-    sendMessageToDB();
+    sendMessageToDB(username, messageInput.value, document.querySelector("span.photo-preview img")?.src);
 });
 
 messageInput.addEventListener("keydown", function(e){
-    if (e.keyCode === 13) {sendMessageToDB();}
+    if (e.keyCode === 13) {sendMessageToDB(username, messageInput.value, document.querySelector("span.photo-preview img")?.src);}
 });
+
+messageInput.addEventListener("keyup", function(e){    
+        if (e.target.value) {set(ref(database, `users/${username}/typing`), true);}
+        else {remove(ref(database, `users/${username}/typing`));}
+})
 
 messageDelete.addEventListener("click", function(e){
     const messageId = messageContextMenu.getAttribute("data-message");
@@ -505,11 +673,13 @@ document.body.addEventListener("click", function(e){
 })
 
 document.addEventListener('visibilitychange', function() {
-    if (username) {
+    if (username && username !== "system") {
         if (document.visibilityState == 'hidden') { 
             set(ref(database, `users/${username}/status`), "offline");
+            remove(ref(database, `users/${username}/typing`));
         } else if (document.visibilityState == 'visible') {
             set(ref(database, `users/${username}/status`), "online");
+            if (messageInput.value){set(ref(database, `users/${username}/typing`), true);}
         }
     }
 });
