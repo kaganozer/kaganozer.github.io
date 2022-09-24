@@ -28,6 +28,7 @@ const prefix = "$";
 
 function scroll(el) {el.scrollTop = el.scrollHeight;}
 
+// TODO: Change login function and detect if user is already logged in based on userAgent
 function login(){
     username = loginInput.value;
     if (username) {
@@ -379,7 +380,7 @@ function sendMessage(messageId, messageData){
             const command = textSplit[0];
             const params = textSplit.slice(1);
             get(child(dbRef, `users/${messageData["sender"]}`)).then((snapshot) => {
-                if (commands[command]) {
+                if (snapshot.key === username && commands[command]) {
                     const userPermissions = snapshot.val()["permissions"];
                     const commandPermissions = commands[command]["permissions"];
                     if (!commandPermissions) {
@@ -395,7 +396,7 @@ function sendMessage(messageId, messageData){
             })
         }
         messageElement.appendChild(messageContent);
-        messageInput.value = "";
+        if (messageData["sender"] === username) {messageInput.value = ""};
     }
     
     if (messageData["deleted"]) {
