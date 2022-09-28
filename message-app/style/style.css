@@ -8,6 +8,8 @@
     --message-section: #5d498a;
     --message-sent: #23163e;
     --message-received: #352456;
+    --reply-color: #a790d7;
+    --message-replying: #153b7d;
     --message-system: #ff0000;
     --message-input: #684d9a;
     --link-color: #22daff;
@@ -136,6 +138,7 @@ input, button {color: white; font-family: "Open Sans";}
 }
 
 .container-body .message-section .message-element {
+    display: grid;
     width: auto; max-width: 250px;
     height: auto; word-wrap: break-word;
     padding: 10px 15px; padding-right: 50px;
@@ -153,14 +156,17 @@ input, button {color: white; font-family: "Open Sans";}
     padding-bottom: 15px;
 }
 .container-body .message-section .message-element.deleted {
-    display: inline !important;
-    color: #fff9; font-style: italic;
+    grid-template-areas:
+    "text text";
     margin-bottom: 0;
+}
+.container-body .message-section .message-element.deleted .message-content {
+    color: #fff9; font-style: italic;
 }
 
 .container-body .message-section .message-element .message-content {grid-area: text;}
 
-.container-body .message-section .message-element .message-content a {color: var(--link-color);}
+.container-body .message-section .message-element a {color: var(--link-color);}
 .container-body .message-section .message-element .message-content code {
     background-color: #0003;
     padding: 0 5px; font-size: 1rem;
@@ -229,7 +235,7 @@ input, button {color: white; font-family: "Open Sans";}
 }
 
 .container-body .message-section .message-element.message-new {
-    display: grid; gap: 5px;
+    gap: 5px;
     grid-template-columns: 25px 1fr;
     grid-template-rows: 25px 1fr;
     grid-template-areas:
@@ -244,6 +250,21 @@ input, button {color: white; font-family: "Open Sans";}
     "image image"
     "text text";
     padding-bottom: 10px;
+}
+.container-body .message-section .message-element.message-new.message-replied {
+    grid-template-rows: 25px auto auto;
+    grid-template-areas:
+    "photo name"
+    "reply reply"
+    "text text";
+}
+.container-body .message-section .message-element.message-new.message-replied.image {
+    grid-template-rows: 25px auto 1fr auto;
+    grid-template-areas:
+    "photo name"
+    "reply reply"
+    "image image"
+    "text text";
 }
 
 .container-body .message-section .message-element.message-new .message-photo {
@@ -265,6 +286,49 @@ input, button {color: white; font-family: "Open Sans";}
     border-radius: 50%;
     border: 2px solid var(--message-bg);
     z-index: 1; place-self: end;
+    grid-area: photo;
+}
+
+.container-body .message-section .message-element.message-replied {
+    gap: 5px;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+    "reply reply"
+    "text text";
+}
+.container-body .message-section .message-element.message-replied.image {
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+    "reply reply"
+    "image image"
+    "text text";
+}
+.container-body .message-section .message-element.message-replied .message-reply {
+    position: relative;
+    grid-area: reply; align-self: center;
+    background-color: var(--color-dark);
+    padding: 10px; border-radius: 5px;
+    display: flex; flex-direction: column;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+.container-body .message-section .message-element.message-replied .message-reply::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 5px; height: 100%;
+    background-color: var(--reply-color);
+    border-radius: 5px 0 0 5px;
+}
+.container-body .message-section .message-element.message-replied .message-reply-name {color: var(--reply-color);}
+.container-body .message-section .message-element.message-replied .message-reply-content i {margin-right: 5px;}
+
+@keyframes reply-fade {
+    0% {background-color: var(--message-replying);}
+}
+
+.container-body .message-section .message-element.message-replying {
+    background-color: var(--message-replying);
 }
 
 .container-body .message-section .date-element {
@@ -382,7 +446,7 @@ input, button {color: white; font-family: "Open Sans";}
     display: flex; justify-content: flex-end;
     position: absolute;
     top: -10px; right: -10px;
-    background-color: var(--color-dark);
+    background-color: inherit;
     border-radius: 5px;
 }
 
@@ -397,6 +461,15 @@ input, button {color: white; font-family: "Open Sans";}
     object-fit: cover;
     border-radius: 5px;
 }
+
+.container-footer .reply-preview {
+    position: absolute; bottom: 100%;
+    padding: 5px 10px 0 10px; border-radius: 0 10px 0 0;
+    background-color: var(--color-dark); gap: 10px;
+    display: none;
+}
+.container-footer .reply-preview.active {display: flex;}
+.container-footer .reply-preview .reply-preview-element .reply-preview-name {font-weight: bold; cursor: pointer;}
 
 .container-footer .photo-upload input {display: none;}
 

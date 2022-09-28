@@ -7,9 +7,14 @@
     <title>Message App</title>
     <link rel="stylesheet" href="style/style.css">
     <link rel="stylesheet" href="style/login.css">
+    <link rel="stylesheet" href="style/loader.css">
     <script src="https://kit.fontawesome.com/7b173948ba.js" crossorigin="anonymous"></script>
 </head>
 <body>
+    <div class="message-app-loader">
+        <div class="loader-dot"></div>
+        <div class="loader-name"></div>
+    </div>
     <div class="message-app-login">
         <div class="login-content">
             <div class="login-title">
@@ -25,6 +30,9 @@
             <img src="imgs/login-background.jpg" alt="">
         </div>
     </div>
+    <div class="message-app-login-error" style="display: none;">
+        <div>Site başka bir pencerede zaten açık. Lütfen bu pencereyi kapatın.</div>
+    </div>
     <div class="message-app-container" style="display:none;">
         <div class="container-header">
             <span class="title"></span>
@@ -34,7 +42,7 @@
                 </button>
                 <span class="options">
                     <li class="option-color">
-                        <span>Renk Seç</span>
+                        <span>Renk seç</span>
                         <input id="user-color-picker" type="color">
                         <span class="user-color-picker">
                             <span data-color="#25263b"></span>
@@ -50,7 +58,11 @@
                     </li>
                     <li>
                         <input id="user-photo-picker" type="file" accept="image/*">
-                        <label for="user-photo-picker">Profil fotoğrafı ekle</label></li>
+                        <label for="user-photo-picker">Profil fotoğrafı ekle</label>
+                    </li>
+                    <li class="logout">
+                        <span>Çıkış yap</span>
+                    </li>
                     <li class="github-link">
                         <a href="https://kaganozer.github.io">Kağan Özer <i class="fa-solid fa-arrow-up-right-from-square"></i></a>
                     </li>
@@ -104,6 +116,11 @@
                     <span class="delete-photo">
                         <i class="fa-solid fa-xmark"></i>
                     </span>
+                </span>
+            </span>
+            <span class="reply-preview">
+                <span class="reply-cancel">
+                    <i class="fa-solid fa-xmark"></i>
                 </span>
             </span>
             <span class="emoji-picker">

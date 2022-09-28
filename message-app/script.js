@@ -6,6 +6,9 @@ const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 const dbRef = ref(database);
 
+const loader = document.querySelector("div.message-app-loader");
+const loaderName = document.querySelector("div.loader-name");
+
 const loginContainer = document.querySelector("div.message-app-login");
 const loginInput = document.querySelector("input#login-name-input");
 const loginSubmit = document.querySelector("div.login-submit");
@@ -28,104 +31,109 @@ const prefix = "$";
 
 function scroll(el) {el.scrollTop = el.scrollHeight;}
 
-// TODO: Change login function and detect if user is already logged in based on userAgent
-function login(){
-    username = loginInput.value;
-    if (username) {
-        get(child(dbRef, `users/${username}`)).then((snapshot) => {
-            if (snapshot.val()?.permissions?.admin) {
-                const password = prompt("Password for admin account");
-                if (password !== snapshot.val()["password"]) {
-                    alert("Wrong password!");
-                    return;
-                }
+function login(user, askForPassword=true){
+    get(child(dbRef, `users/${user}`)).then((snapshot) => {
+        if (snapshot.val()?.permissions?.admin && askForPassword) {
+            const password = prompt("Password for admin account");
+            if (password !== snapshot.val()["password"]) {
+                alert("Wrong password!");
+                return;
             }
+        }
 
-            if (!snapshot.exists()) {
-                const userData = {
-                    "createTime": Date.now(),
-                    "profilePhoto": "./imgs/default-avatar.png",
-                    "status": "online"
-                }
-                set(ref(database, `users/${username}`), userData);
+        if (!snapshot.exists()) {
+            const userData = {
+                "createTime": Date.now(),
+                "profilePhoto": "./imgs/default-avatar.png",
+                "status": "online",
+                "userAgent": navigator.userAgent
             }
+            set(ref(database, `users/${user}`), userData);
+        } else {
+            set(ref(database, `users/${user}/status`), user === "system" ? "dnd" : "online");
+            set(ref(database, `users/${user}/userAgent`), navigator.userAgent);
+        }
 
-            get(child(dbRef, "messages")).then((snapshot) => {
-                if (snapshot.exists()){
-                    const messages = snapshot.val();
-                    const messagesArr = Object.keys(messages);
-                    messagesArr.sort(function (a, b) {
-                        return (+a.replace("message", "")) - (+b.replace("message", ""));
-                    });
-                    messagesArr.forEach(message => {
-                        sendMessage(message, messages[message]);
-                    })
-                }
-            })
+        get(child(dbRef, "messages")).then((snapshot) => {
+            if (snapshot.exists()){
+                snapshot.forEach(message => {
+                    sendMessage(message.key, message.val());
+                })
+            }
 
             loginContainer.style.display = "none";
             messageContainer.style.display = "grid";
             scroll(messageSection);
             messageInput.focus();
-            appTitle.innerHTML = username;
+            appTitle.textContent = user;
             online = true;
-        })
+            // document.body.innerHTML = messageContainer.outerHTML;
+        });
+    })
 
-        get(child(dbRef, "users")).then((snapshot) => {
-            if (snapshot.exists()){
-                Object.keys(snapshot.val()).forEach(user => {
-                    onChildChanged(ref(database, `users/${user}/`), (child) => {
-                        if (child.key === "status") {
-                            [...document.querySelectorAll(`.message-element[data-user='${user}'] .user-status`)].forEach(el => {
-                                el.style["background-color"] = status[child.val()];
-                            });
-                        }
-                        if (child.key === "color") {
-                            [...document.querySelectorAll(`.message-element[data-user='${user}'] .message-username`)].forEach(el => {
-                                el.style["color"] = child.val();
-                            });
-                        }
-                        if (child.key === "profilePhoto") {
-                            [...document.querySelectorAll(`.message-element[data-user='${user}'] .message-photo`)].forEach(el => {
-                                el.src = child.val();
-                            });
-                        }
-                    });
+    get(child(dbRef, "users")).then((snapshot) => {
+        if (snapshot.exists()){
+            snapshot.forEach(user => {
+                onChildChanged(ref(database, `users/${user.key}/`), (child) => {
+                    if (child.key === "status") {
+                        [...document.querySelectorAll(`.message-element[data-user='${user.key}'] .user-status`)].forEach(el => {
+                            el.style["background-color"] = status[child.val()];
+                        });
+                    }
+                    if (child.key === "color") {
+                        [...document.querySelectorAll(`.message-element[data-user='${user.key}'] .message-username`)].forEach(el => {
+                            el.style["color"] = child.val();
+                        });
+                    }
+                    if (child.key === "profilePhoto") {
+                        [...document.querySelectorAll(`.message-element[data-user='${user.key}'] .message-photo`)].forEach(el => {
+                            el.src = child.val();
+                        });
+                    }
+                });
 
-                    onChildAdded(ref(database, `users/${user}`), (child) => {
-                        if (child.key === "typing") {
-                            const userElement = document.createElement("span");
-                            if (typingUsers.firstChild) {userElement.innerHTML = ", ";}
-                            else {messageTyping.classList.add("active");}
-                            userElement.innerHTML += user;
-                            userElement.setAttribute("data-user", user);
-                            typingUsers.appendChild(userElement);
-                        }
-                    })
-
-                    onChildRemoved(ref(database, `users/${user}`), (child) => {
-                        if (child.key === "typing") {
-                            const userElement = typingUsers.querySelector(`span[data-user='${user}']`);
-                            typingUsers.removeChild(userElement);
-                            if (!typingUsers.firstChild) {messageTyping.classList.remove("active");}
-                            else {typingUsers.firstChild.innerHTML = typingUsers.firstChild.innerHTML.replace(", ", "");}
-                        }
-                    })
+                onChildAdded(ref(database, `users/${user.key}`), (child) => {
+                    if (child.key === "typing") {
+                        const userElement = document.createElement("span");
+                        if (typingUsers.firstChild) {userElement.textContent = ", ";}
+                        else {messageTyping.classList.add("active");}
+                        userElement.textContent += user.key;
+                        userElement.setAttribute("data-user", user.key);
+                        typingUsers.appendChild(userElement);
+                    }
                 })
-            }
-        })
-        
-        set(ref(database, `users/${username}/status`), username === "system" ? "dnd" : "online");
-    }
+
+                onChildRemoved(ref(database, `users/${user.key}`), (child) => {
+                    if (child.key === "typing") {
+                        const userElement = typingUsers.querySelector(`span[data-user='${user.key}']`);
+                        typingUsers.removeChild(userElement);
+                        if (!typingUsers.firstChild) {messageTyping.classList.remove("active");}
+                        else {typingUsers.firstChild.textContent = typingUsers.firstChild.textContent.replace(", ", "");}
+                    }
+                })
+            })
+        }
+    })
 }
 
-loginSubmit.addEventListener("click", function(e){login();})
-loginInput.addEventListener("keydown", function(e){if (e.keyCode === 13) {login()};})
+loginSubmit.addEventListener("click", function(e){
+    username = loginInput.value.toLowerCase().trim();
+    if (username) {login(username);}
+});
+loginInput.addEventListener("keydown", function(e){
+    if (e.keyCode === 13) {
+        username = loginInput.value.toLowerCase().trim();
+        if (username) {login(username);}
+    };
+});
 
 const messageSend = document.querySelector("span.send-message");
 const messageContextMenu = document.querySelector("div.message-context-menu");
 const messageReactions = document.querySelectorAll("span.reaction");
 const messageDelete = document.querySelector("span.message-delete");
+const messageReply = document.querySelector("span.message-reply");
+const replyPreview = document.querySelector("span.reply-preview");
+const replyCancel = document.querySelector("span.reply-cancel");
 const photoPreview = document.querySelector("span.photo-preview");
 const showAppOptions = document.querySelector("button.dots");
 const appOptions = document.querySelector("span.options");
@@ -134,6 +142,7 @@ const photoDelete = document.querySelector("span.delete-photo");
 const scrollToBottom = document.querySelector("div.scroll");
 const userColorInput = document.querySelector("input#user-color-picker");
 const profilePhotoInput = document.querySelector("input#user-photo-picker");
+const logoutButton = document.querySelector("li.logout");
 
 function normalizePosition(mouseX, mouseY) {
     const {
@@ -175,10 +184,10 @@ function getDateFromMS(milliseconds){
     return `${day} ${month} ${year}`;
 }
 
-function sendMessageToDB(user, text, image=null, deleteAfter=false){
+function sendMessageToDB(user, text, image=null, replied=null, deleteAfter=false){
     if (!online) {return;}
     if (!text && !image) {return;}
-    
+
     const createTime = new Date();
 
     const messageInfo = {
@@ -186,8 +195,9 @@ function sendMessageToDB(user, text, image=null, deleteAfter=false){
         "createTime": createTime.getTime()
     };
 
-    if (image) {messageInfo["imageURL"] = image};
-    if (text) {messageInfo["content"] = text};
+    if (image) {messageInfo["imageURL"] = image;}
+    if (text) {messageInfo["content"] = text;}
+    if (replied) {messageInfo["replied"] = replied;}
     if (deleteAfter) {messageInfo["deleteAfter"] = true};
     if (text.startsWith(prefix)) {messageInfo["command"] = true;}
 
@@ -195,7 +205,7 @@ function sendMessageToDB(user, text, image=null, deleteAfter=false){
         if (snapshot.exists()) {
             const messagesArr = Object.keys(snapshot.val());
             const previousMessageId = messagesArr[messagesArr.length-1];
-            
+
             if (messageInfo["sender"] !== snapshot.val()[previousMessageId]["sender"]) {
                 messageInfo["newMessageFromUser"] = true;
             }
@@ -237,7 +247,7 @@ function sendMessage(messageId, messageData){
 
         const messageName = document.createElement("span");
         messageName.classList.add("message-username");
-        messageName.innerHTML = messageData["sender"];
+        messageName.textContent = messageData["sender"];
 
         const userPhoto = document.createElement("img");
         userPhoto.classList.add("message-photo");
@@ -250,6 +260,10 @@ function sendMessage(messageId, messageData){
                 messageName.style.color = snapshot.val()["color"];
                 userPhoto.src = snapshot.val()["profilePhoto"];
                 userStatus.style["background-color"] = status[snapshot.val()["status"]];
+            } else {
+                messageName.textContent += " (deleted)";
+                userPhoto.src = "./imgs/default-avatar.png";
+                userStatus.style["background-color"] = status["offline"];
             }
         })
 
@@ -257,7 +271,7 @@ function sendMessage(messageId, messageData){
         messageElement.appendChild(userStatus);
         messageElement.appendChild(messageName);
     }
-    
+
     if (messageData["sender"] === username) {messageElement.classList.add("message-sent");}
     else {messageElement.classList.add("message-received");}
 
@@ -266,9 +280,9 @@ function sendMessage(messageId, messageData){
             remove(ref(database, `messages/${messageId}`));
         }, 1500);
     }
-    
+
     messageElement.setAttribute("data-time", getTimeFromMS(messageData["createTime"]));
-    
+
     if (image) {
         const imageContent = document.createElement("img");
         imageContent.classList.add("image-content");
@@ -282,27 +296,41 @@ function sendMessage(messageId, messageData){
         const messageContent = document.createElement("span");
         messageContent.classList.add("message-content");
 
-        // * Message formatting
-        // link: https://
-        // bold: *text*
-        // italic: _text_
-        // strike through: -text-
-        // underline: !text!
-        // embed: `text`
+        // TODO: Message formatting
         // https://stackoverflow.com/questions/15278728/regular-expression-formatting-text-in-a-block-im
-        const linkPattern  = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
-        const boldPattern = /(?![^<]*<\/a>)(^|<.>|[\s\W_])\*(\S.*?\S)\*($|<\/.>|[\s\W_])/g;
-        const italicsPattern = /(?![^<]*<\/a>)(^|<.>|[\s\W])_(\S.*?\S)_($|<\/.>|[\s\W])/g;
-        const strikethroughPattern = /(?![^<]*<\/a>)(^|<.>|[\s\W_])-(\S.*?\S)-($|<\/.>|[\s\W_])/gi;
-        const underlinePattern = /(?![^<]*<\/a>)(^|<.>|[\s\W_])!(\S.*?\S)!($|<\/.>|[\s\W_])/gi;
-        const embedPattern = /(?![^<]*<\/a>)(^|<.>|[\s\W_])`(\S.*?\S)`($|<\/.>|[\s\W_])/gi;
-        messageContent.innerHTML =
-            text.replace(linkPattern, "<a href=\"$1\">$1</a>")
-                .replace(strikethroughPattern, "$1<s>$2</s>$3")
-                .replace(italicsPattern, "$1<i>$2</i>$3")
-                .replace(boldPattern, "$1<b>$2</b>$3")
-                .replace(underlinePattern, "$1<u>$2</u>$3")
-                .replace(embedPattern, "$1<code>$2</code>$3");
+        const patterns = {
+            // link: {
+            //     pattern: /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig,
+            //     replace: "<a href=\"$1\">$1</a>"
+            // },
+            bold: {
+                pattern: /(?![^<]*<\/a>)(^|<.>|[\s\W_])\*(\S.*?\S)\*($|<\/.>|[\s\W_])/g,
+                replace: "$1<b>$2</b>$3",
+                character: "*"
+            },
+            italic: {
+                pattern: /(?![^<]*<\/a>)(^|<.>|[\s\W])_(\S.*?\S)_($|<\/.>|[\s\W])/g,
+                replace: "$1<i>$2</i>$3",
+                character: "_"
+            },
+            strikethrough: {
+                pattern: /(?![^<]*<\/a>)(^|<.>|[\s\W_])-(\S.*?\S)-($|<\/.>|[\s\W_])/gi,
+                replace: "$1<s>$2</s>$3",
+                character: "-"
+            },
+            underline: {
+                pattern: /(?![^<]*<\/a>)(^|<.>|[\s\W_])!(\S.*?\S)!($|<\/.>|[\s\W_])/gi,
+                replace: "$1<u>$2</u>$3",
+                character: "*"
+            },
+            embed: {
+                pattern: /(?![^<]*<\/a>)(^|<.>|[\s\W_])`(\S.*?\S)`($|<\/.>|[\s\W_])/gi,
+                replace: "$1<code>$2</code>$3",
+                character: "`"
+            }
+        };
+
+        messageContent.textContent = text;
 
         // * Bot commands
         if (messageData["command"]) {
@@ -310,7 +338,8 @@ function sendMessage(messageId, messageData){
             const errors = {
                 user: "Belirtilen kullanıcı bulunamadı.",
                 command: "Belirtilen komut bulunamadı.",
-                permission: "Bu komutu kullanmak için gerekli yetkiye sahip değilsiniz."
+                permission: "Bu komutu kullanmak için gerekli yetkiye sahip değilsiniz.",
+                invalid: "Geçersiz komut biçimi."
             }
             const commands = {
                 // Fun commands
@@ -343,14 +372,26 @@ function sendMessage(messageId, messageData){
                 delete: {
                     permissions: ["admin"],
                     handler: function(amount=1) {
+                        if (!(amount === "all") && isNaN(amount)) {sendMessageToDB("system", errors["invalid"]); return;}
                         get(child(dbRef, "messages")).then((snapshot) => {
                             const messagesArr = Object.keys(snapshot.val()).reverse();
-                            amount = (amount === "all") ? messagesArr.length : amount;
-                            const feedBack = (amount === "all") ? "Bütün mesajlar silindi." : `${amount} adet mesaj silindi.`;
-                            for (let i=0; i<(+amount)+1; i++) {
-                                remove(ref(database, `messages/${messagesArr[i]}`));
+
+                            let feedBack;
+                            if (messageData["replied"]) {
+                                remove(ref(database, `messages/${messageData["replied"]}`));
+                                feedBack = "Belirtilen mesaj silindi.";
+                            } else {
+                                if (amount === "all") {
+                                    amount = messagesArr.length;
+                                    feedBack = "Bütün mesajlar silindi.";
+                                } else {feedBack = `${amount} adet mesaj silindi.`;}
+
+                                for (let i=0; i<(+amount)+1; i++) {
+                                    remove(ref(database, `messages/${messagesArr[i]}`));
+                                }
                             }
-                            sendMessageToDB("system", feedBack, null, true);
+
+                            sendMessageToDB("system", feedBack, null, null, true);
                         })
                     },
                     info: "Girilen miktarda mesajı siler."
@@ -399,22 +440,79 @@ function sendMessage(messageId, messageData){
         if (messageData["sender"] === username) {messageInput.value = ""};
     }
     
-    if (messageData["deleted"]) {
-        messageElement.innerHTML = "Bu mesaj silindi.";
-        messageElement.classList.add("deleted");
+    if (messageData["replied"]) {
+        const replyTo = messageData["replied"];
+        const repliedMessage = document.querySelector(`#${replyTo}`);
+        const repliedName = repliedMessage?.getAttribute("data-user") ?? null;
+        
+        get(child(dbRef, `users/${repliedName}`)).then((child) => {
+            const replyElement = document.createElement("span");
+            replyElement.classList.add("message-reply");
+            const replyContent = document.createElement("span");
+            replyContent.classList.add("message-reply-content");
+            
+            const repliedContent = repliedMessage.querySelector(".message-content");
+            const repliedImage = repliedMessage.querySelector(".image-content");
+            
+            const replyName = document.createElement("span");
+            replyName.classList.add("message-reply-name");
+            
+            if (child.exists()) {
+                if (child.val()["color"]) {replyElement.style.setProperty("--reply-color", child.val()["color"]);}
+                replyName.textContent = repliedName;
+            } else {replyName.textContent = "deleted-user";}
+            
+            const contentLimit = 300;
+            if (repliedContent) {
+                if (repliedContent.textContent.length > contentLimit) {replyContent.textContent = repliedContent.textContent.slice(0, contentLimit) + "...";}
+                else {replyContent.textContent = repliedContent.textContent;}
+            }
+            else if (repliedImage) {
+                replyContent.innerHTML = "<i class='fa-solid fa-image'></i>Fotoğraf";
+            }
+            
+            if (repliedMessage.classList.contains("deleted")) {
+                replyContent.textContent = "Bu mesaj silindi.";
+                replyContent.style["font-style"] = "italic";
+                replyElement.appendChild(replyContent);
+            }
+
+            replyElement.appendChild(replyName);
+            replyElement.appendChild(replyContent);
+            
+            replyElement.addEventListener("click", function(e){
+                repliedMessage.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                    inline: "center"
+                })
+                repliedMessage.style["animation"] = "reply-fade 1s ease-in";
+                setTimeout(function(){repliedMessage.style["animation"]="";}, 1000);
+            });
+
+            messageElement.appendChild(replyElement);
+            messageElement.classList.add("message-replied");
+            cancelMessageReply();
+        });
+
     }
-    
+
     const reactionElement = document.createElement("span");
     reactionElement.classList.add("reaction-element");
+    const emojiCount = document.createElement("span");
+    emojiCount.classList.add("emoji-count");
+    emojiCount.textContent = 0;
+    reactionElement.appendChild(emojiCount);
     messageElement.appendChild(reactionElement);
     
-    if (messageData["reactions"] && !messageData["deleted"]) {
+    if (messageData["reactions"]) {
         Object.keys(messageData["reactions"]).forEach(user => {
             addReaction(messageElement, messageData["reactions"][user], user);
         })
     }
     
     messageSection.appendChild(messageElement);
+    remove(ref(database, `users/${username}/typing`));
     scroll(messageSection);
     
     if (messageData["newDate"]) {
@@ -426,11 +524,11 @@ function sendMessage(messageId, messageData){
         const difference = Math.floor((currentTime - dateCreateTime) / (1000 * 3600 * 24));
         
         if (getDateFromMS(messageData["createTime"]) === getDateFromMS(Date.now())) {
-            dateElement.innerHTML = "Bugün";
+            dateElement.textContent = "Bugün";
         } else if (difference <= 3) {
-            dateElement.innerHTML = new Intl.DateTimeFormat('tr-TR', {weekday: "long"}).format(dateCreateTime);
+            dateElement.textContent = new Intl.DateTimeFormat('tr-TR', {weekday: "long"}).format(dateCreateTime);
         } else {
-            dateElement.innerHTML = getDateFromMS(messageData["createTime"]);
+            dateElement.textContent = getDateFromMS(messageData["createTime"]);
         }
         
         messageSection.insertBefore(dateElement, messageElement);
@@ -457,36 +555,53 @@ function sendMessage(messageId, messageData){
         
         messageElement.addEventListener("dblclick", function(e){
             const doubleClickEmoji = "emoji-heart";
-            if (reactionElement.querySelector(`img.emoji[data-user='${username}'][data-emoji='${doubleClickEmoji}']`)) {
-                remove(ref(database, `messages/${messageId}/reactions/${username}`));
-            } else {
-                set(ref(database, `messages/${messageId}/reactions/${username}`), doubleClickEmoji);
-            }
-        })
+            get(child(dbRef, `messages/${messageId}/reactions/${username}`)).then(snapshot => {
+                if (snapshot.exists() && snapshot.val() === doubleClickEmoji) {
+                    remove(ref(database, `messages/${messageId}/reactions/${username}`));
+                } else {
+                    set(ref(database, `messages/${messageId}/reactions/${username}`), doubleClickEmoji);
+                }
+            });
+        });
+
+        if (messageData["deleted"]) {deleteMessage(messageElement);}
         
         onChildAdded(ref(database, `messages/${messageId}/reactions/`), (child) => {
             addReaction(
                 document.querySelector(`#${messageId}`), child.val(), child.key
             );
-        })
+        });
         onChildChanged(ref(database, `messages/${messageId}/reactions/`), (child) => {
             addReaction(
-                document.querySelector(`#${messageId}`), child.val(), child.key
+                document.querySelector(`#${messageId}`), child.val(), child.key, true
             );
-        })
+        });
         onChildRemoved(ref(database, `messages/${messageId}/reactions/`), (child) => {
             removeReaction(
-                document.querySelector(`#${messageId}`), child.key
+                document.querySelector(`#${messageId}`), child.val(), child.key
             );
-        })
-
+        });
+        
         onChildAdded(ref(database, `messages/${messageId}/`), (child) => {
-            if (child.key === "deleted") {
-                messageElement.innerHTML = "Bu mesaj silindi.";
-                messageElement.classList.add("deleted");
-            }
-        })
+            if (child.key === "deleted") {deleteMessage(messageElement);}
+        });
     }
+}
+
+function deleteMessage(messageElement) {
+    let messageContent = messageElement.querySelector(".message-content") ?? document.createElement("span");
+    const imageContent = messageElement.querySelector(".image-content");
+    const replyContent = messageElement.querySelector("span.message-reply");
+    console.log(replyContent);
+    console.log(messageElement.innerHTML);
+    const reactions = messageElement.querySelector(".reaction-element");
+    if (imageContent) {messageElement.removeChild(imageContent);}
+    if (replyContent) {messageElement.removeChild(replyContent);}
+    if (reactions) {messageElement.removeChild(reactions);}
+    messageContent.classList.add("message-content");
+    messageContent.textContent = "Bu mesaj silindi.";
+    if (!messageElement.contains(messageContent)) {messageElement.appendChild(messageContent);}
+    messageElement.classList.add("deleted");
 }
 
 onChildRemoved(ref(database, `messages/`), (snapshot) => {
@@ -494,6 +609,10 @@ onChildRemoved(ref(database, `messages/`), (snapshot) => {
         const messageElement = document.querySelector(`#${snapshot.key}`);
         const previousElement = messageElement.previousElementSibling;
         const nextElement = messageElement.nextElementSibling;
+        if (messageElement.classList.contains("message-new") && nextElement && (nextElement.getAttribute("data-user") === messageElement.getAttribute("data-user"))) {
+            nextElement.classList.add("message-new");
+            set(ref(database, `messages/${nextElement.id}/newMessageFromUser`), true);
+        }
         if (previousElement.classList.contains("date-element") && (!nextElement || nextElement.classList.contains("date-element"))) {
             messageSection.removeChild(previousElement);
         };
@@ -517,54 +636,138 @@ onChildRemoved(ref(database, `messages/`), (snapshot) => {
     })
 })
 
-function addReaction(messageElement, emoji, user) {
+function addReaction(messageElement, emoji, user, changed=false) {
+    if (messageElement.classList.contains("deleted")) {return;}
     const reactionElement = messageElement.querySelector("span.reaction-element");
+    const emojiElements = reactionElement.querySelectorAll("img.emoji");
     let emojiElement = reactionElement.querySelector(`img.emoji[data-user='${user}']`);
-    
+    const emojiCount = reactionElement.querySelector("span.emoji-count");
+
     if (!emojiElement) {
         emojiElement = document.createElement("img");
         emojiElement.classList.add("emoji");
         emojiElement.setAttribute("data-user", user);
         emojiElement.draggable = false;
-    } 
+    }
+
     emojiElement.src = `./imgs/emojis/${emoji}.png`;
-    emojiElement.alt = emojis[emoji];
     emojiElement.setAttribute("data-emoji", emoji);
-    
+    const sameEmojiExists = [...emojiElements].filter(e => e.getAttribute("data-emoji") === emoji);
+
+    get(child(dbRef, `messages/${messageElement.id}/reactions`)).then((snapshot) => {
+        emojiCount.textContent = Object.keys(snapshot.val()).length;
+    });
+
     reactionElement.classList.add("active");
     messageElement.classList.add("reacted");
-    reactionElement.appendChild(emojiElement);
+    if (!(sameEmojiExists.length)) {reactionElement.insertBefore(emojiElement, emojiCount);}
+    else if (changed) {reactionElement.removeChild(emojiElement);}
 }
 
-function removeReaction(messageElement, user) {
+function removeReaction(messageElement, emoji,  user) {
     const reactionElement = messageElement.querySelector("span.reaction-element")
     const emojiElement = reactionElement.querySelector(`img.emoji[data-user='${user}']`);
-    reactionElement.removeChild(emojiElement);
-    if (!reactionElement.firstChild) {reactionElement.classList.remove("active"); messageElement.classList.remove("reacted")};
+    const emojiCount = reactionElement.querySelector("span.emoji-count");
+    get(child(dbRef, `messages/${messageElement.id}/reactions`)).then((snapshot) => {
+        if (snapshot.exists) {
+            emojiCount.textContent = Object.keys(snapshot.val()).length;
+            const sameEmojiExists = Object.values(snapshot.val()).filter(e => e === emoji);
+            if (!(sameEmojiExists.length)) {
+                reactionElement.removeChild(emojiElement);
+            }
+        }
+        else {
+            emojiCount.textContent = "";
+            reactionElement.removeChild(emojiElement);
+        }
+    });
+    if (!reactionElement.querySelector("img.emoji")) {reactionElement.classList.remove("active"); messageElement.classList.remove("reacted")};
 }
 
-document.addEventListener("load", (e) => {
-    scroll(messageSection);
+window.addEventListener("load", (e) => {
+    setTimeout(
+        function(){loader.style["display"] = "none";}, 1500
+    );
+    get(child(dbRef, "users")).then(snapshot => {
+        if (snapshot.exists()) {
+            snapshot.forEach(user => {
+                if (user.val()["userAgent"] === navigator.userAgent) {
+                    if (user.val()["status"] === "online") {
+                        const errorElement = document.querySelector(".message-app-login-error");
+                        errorElement.style["display"] = "block";
+                        document.body.innerHTML = errorElement.outerHTML;
+                        return;
+                    }
+                    username = user.key
+                    login(username, false);
+                }
+            })
+        }
+    })
 });
 
 messageSend.addEventListener("click", function(e){
-    sendMessageToDB(username, messageInput.value, document.querySelector("span.photo-preview img")?.src);
+    sendMessageToDB(
+        username,
+        messageInput.value,
+        document.querySelector("span.photo-preview img")?.src,
+        document.querySelector("span.reply-preview span.reply-preview-element")?.getAttribute("data-message")
+    );
 });
 
 messageInput.addEventListener("keydown", function(e){
-    if (e.keyCode === 13) {sendMessageToDB(username, messageInput.value, document.querySelector("span.photo-preview img")?.src);}
+    if (e.keyCode === 13) {
+        sendMessageToDB(
+            username,
+            messageInput.value,
+            document.querySelector("span.photo-preview img")?.src,
+            document.querySelector("span.reply-preview span.reply-preview-element")?.getAttribute("data-message")
+        );
+    }
 });
 
-messageInput.addEventListener("keyup", function(e){    
-        if (e.target.value) {set(ref(database, `users/${username}/typing`), true);}
-        else {remove(ref(database, `users/${username}/typing`));}
+messageInput.addEventListener("keyup", function(e){
+    if (e.target.value) {set(ref(database, `users/${username}/typing`), true);}
+    else {remove(ref(database, `users/${username}/typing`));}
 })
 
 messageDelete.addEventListener("click", function(e){
-    const messageId = messageContextMenu.getAttribute("data-message");
-    set(ref(database, `messages/${messageId}/deleted`), true);
+    const messageToDelete = messageContextMenu.getAttribute("data-message");
+    set(ref(database, `messages/${messageToDelete}/deleted`), true);
     messageContextMenu.classList.remove("active");
-})
+});
+
+messageReply.addEventListener("click", function(e){
+    document.querySelector(".message-replying")?.classList.remove("message-replying");
+
+    const messageToReply = messageContextMenu.getAttribute("data-message");
+    const messageReplyElement = document.querySelector(`#${messageToReply}`);
+    messageReplyElement.classList.add("message-replying");
+
+    const replyName = messageReplyElement.getAttribute("data-user");
+    const previewElement = replyPreview.querySelector(".reply-preview-element") ?? document.createElement("span");
+    const previewName = previewElement.querySelector(".reply-preview-name") ?? document.createElement("span");
+
+    previewName.classList.add("reply-preview-name");
+    previewName.textContent = replyName;
+    if (!previewElement.contains(previewName)) {previewElement.appendChild(previewName);}
+    previewElement.classList.add("reply-preview-element");
+    previewElement.textContent += " kullanıcısına yanıt veriliyor.";
+    previewElement.setAttribute("data-message", messageToReply);
+    if (!replyPreview.contains(previewElement)) {replyPreview.insertBefore(previewElement, replyCancel);}
+    replyPreview.classList.add("active");
+
+    messageContextMenu.classList.remove("active");
+});
+
+function cancelMessageReply() {
+    const previewElement = replyPreview.querySelector(".reply-preview-element");
+    if (previewElement) {replyPreview.removeChild(previewElement);}
+    replyPreview.classList.remove("active");
+    document.querySelector(".message-replying")?.classList.remove("message-replying");
+}
+
+replyCancel.addEventListener("click", cancelMessageReply);
 
 showAppOptions.addEventListener("click", function(e){
     showAppOptions.classList.toggle("active");
@@ -637,7 +840,7 @@ photoInput.addEventListener("change", function(e){
         previewElement.src = reader.result;
     })
     reader.readAsDataURL(photoToUpload);
-    
+
     if (!photoPreview.contains(previewElement)) {photoPreview.appendChild(previewElement);}
     photoPreview.style.display = "block";
     photoInput.value = "";
@@ -673,14 +876,14 @@ document.body.addEventListener("click", function(e){
     }
 })
 
-document.addEventListener('visibilitychange', function() {
+window.addEventListener("beforeunload", function() {
     if (username && username !== "system") {
-        if (document.visibilityState == 'hidden') { 
-            set(ref(database, `users/${username}/status`), "offline");
-            remove(ref(database, `users/${username}/typing`));
-        } else if (document.visibilityState == 'visible') {
-            set(ref(database, `users/${username}/status`), "online");
-            if (messageInput.value){set(ref(database, `users/${username}/typing`), true);}
-        }
+        set(ref(database, `users/${username}/status`), "offline");
+        remove(ref(database, `users/${username}/typing`));
     }
 });
+
+logoutButton.addEventListener("click", function(e){
+    remove(ref(database, `users/${username}/userAgent`));
+    location.reload();
+})
