@@ -51,7 +51,7 @@ function login(user, askForPassword=true){
             set(ref(database, `users/${user}`), userData);
         } else {
             set(ref(database, `users/${user}/status`), user === "system" ? "dnd" : "online");
-            set(ref(database, `users/${user}/userAgent`), navigator.userAgent);
+            set(ref(database, `users/${user}/userAgent/${navigator.userAgent}`), true);
         }
 
         get(child(dbRef, "messages")).then((snapshot) => {
@@ -691,7 +691,7 @@ window.addEventListener("load", (e) => {
     get(child(dbRef, "users")).then(snapshot => {
         if (snapshot.exists()) {
             snapshot.forEach(user => {
-                if (user.val()["userAgent"] === navigator.userAgent) {
+                if (user.val()["userAgent"][navigator.userAgent]) {
                     if (user.val()["status"] === "online") {
                         const errorElement = document.querySelector(".message-app-login-error");
                         errorElement.style["display"] = "block";
